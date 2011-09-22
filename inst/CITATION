@@ -1,0 +1,18 @@
+citHeader("To cite the GMD package in publications use:")
+
+citEntry(entry="article",
+  author   = "Xiaobei Zhao, Eivind Valen, Brian J Parker, Albin Sandelin",
+  title    = "Systematic Clustering of Transcription Start Site Landscapes",
+  journal  = "PLoS ONE",
+  year     = 2011,
+  volume   = 6,
+  pages    = "e23409",
+  number   = 8,
+  url      = "http://dx.plos.org/10.1371/journal.pone.0023409",
+  textVersion=
+    paste("Zhao et al (2011),",
+          "Systematic Clustering of Transcription Start Site Landscapes,", 
+          "PLoS ONE 6(8): e23409.",
+          sep=" ")
+)
+
