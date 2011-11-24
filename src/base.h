@@ -1,8 +1,3 @@
-// initialize an array given length?
-// import external file, will the main() in that file also run?
-
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>

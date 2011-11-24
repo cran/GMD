@@ -1,0 +1,195 @@
+
+
+\usepackage{bioinfo}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=magenta, urlcolor=blue, citecolor=black}
+\urlstyle{same}
+
+\usepackage{color}
+\usepackage{caption}
+\captionsetup{margin=0pt,indention=0pt,parindent=0pt,font=small,textfont=default,labelfont=bf,singlelinecheck=off,justification=raggedright}
+
+%% Sweave
+\usepackage[noae]{Sweave}
+\definecolor{Snote}{rgb}{0,0,0}
+\definecolor{Scode}{rgb}{0,0,0.56}
+\definecolor{Sinput}{rgb}{0,0,0}
+\definecolor{Soutput}{rgb}{0,0,0}
+\renewenvironment{Schunk}{\par\begin{minipage}{\textwidth}}{\end{minipage}}
+\DefineVerbatimEnvironment{Snote}{Verbatim}{formatcom={\color{Snote}},fontsize=\tiny}
+\DefineVerbatimEnvironment{Scode}{Verbatim}{formatcom={\color{Scode}},fontsize=\small} 
+\DefineVerbatimEnvironment{Sinput}{Verbatim}{formatcom={\color{Sinput}},fontsize=\scriptsize,baselinestretch=0.9}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{formatcom={\color{Soutput}},fontsize=\scriptsize,baselinestretch=0.85,numbers=none}
+
+\newcommand{\strong}[1]{{\normalfont\fontseries{b}\selectfont #1}}
+\let\pkg=\strong
+
+
+\usepackage{graphicx}
+\usepackage{subfigure}
+\graphicspath{{./} {./fig/} {../fig/}}
+\DeclareGraphicsExtensions{.pdf,.png,.jpg,.bmp,.eps}
+
+\usepackage{lscape}                    % pdflscape.
+
+
+% \usepackage{ucs} %% needed for R output: signif stars etc, quotes
+% \usepackage[utf8x]{inputenc}
+% \usepackage[T1]{fontenc}
+% \usepackage{sidecap}
+% \usepackage{amsmath}
+
+\renewcommand{\floatpagefraction}{0.8}
+
+
+%% firstnumber=#1,numbers=left
+
+\oddsidemargin3mm
+\evensidemargin3mm
+\topmargin-12mm
+\headheight12pt
+\textwidth168mm
+\textheight224mm
+%\parindent0pt
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1ex plus 0.5ex minus 0.2ex}
+
+\makeatletter
+\renewcommand{\paragraph}{%
+  \@startsection{paragraph}{4}%
+  {\z@}{1.5ex \@plus 1ex \@minus .2ex}{-1em}%
+  {\normalfont\normalsize\bfseries}%
+}
+\makeatother
+
+
+
+
+%% filename, caption
+\newcommand{\vignetteSource}[2]{
+  \def\Fname{#1}
+  \def\argtwo{#2}
+  \def\empty{}
+  
+  \ifx \argtwo \empty
+   \def\scaption{Source code of ``\Fname''.}
+  \else
+  \def\scaption{\argtwo}
+  \fi
+  %%\begin{figure}[H] 
+  \begin{figure}[!ht]
+    \centering
+    \VerbatimInput[numbers=left,
+    frame=single,
+    label=\Fname]{\Fname}
+    \caption{\scaption}
+    \label{src:\Fname}
+  \end{figure}
+}
+
+
+\newcommand{\vignetteFigure}[5]{
+  \def\Fname{#1}
+  \def\argtwo{#2}
+  \def\argthree{#3}
+  \def\argfour{#4}
+  \def\argfive{#5}
+
+  \def\empty{}
+  
+  \ifx \argthree \empty
+  \def\argthree{0.75}
+  \fi
+
+  \ifx \argfive \empty
+  \def\sargfive{}
+  \else
+  \def\sargfive{\ of source code ``\argfive''}
+  \fi
+
+  \ifx \argfour \empty
+  \def\argfour{1}
+  \fi
+
+  \ifx \argtwo \empty
+   \def\scaption{Graphical output \argfour \sargfive.}
+  \else
+  \def\scaption{\argtwo}
+  \fi
+
+  %%\begin{figure}[H] 
+  \begin{figure}[!ht]
+    \centering
+    \includegraphics[angle=0,
+    width=\argthree\textwidth,
+    page=\argfour]{\Fname}
+    \caption{\scaption}
+    \label{src:\Fname}
+  \end{figure}
+}
+
+
+\newenvironment{vignetteDynFigure}[1]{
+  \def\arg{#1}
+  \par\begin{figure}[!h] 
+    \centering
+  }{
+    \caption{Graphical output of \arg.}
+    \label{fig:\arg}
+  \end{figure}
+  \clearpage
+}
+
+
+
+
+
+% % e.g.
+% % \vignetteSource{case-nottem.R}{}
+% % <<a>>=
+% % source(file="case-nottem.R")
+% % @
+
+% % \begin{vignetteFigure}{case-nottem.R}
+% % <<echo=FALSE,results=hide,fig=TRUE>>=
+% % <<a>>
+% % @
+% % \end{vignetteFigure}
+
+
+
+% \newcommand{texFigure}[3]{
+%   \def\arg{#1}
+%   \def\argg{#2}
+%   \def\arggg{#3}
+%   \begin{figure}[!h] 
+%     \centering 
+%     \includegraphics[angle=0, width=\argg\textwidth]{\arg}
+%     \caption{Graphical output of \arggg.}
+%     \label{fig:\arggg}
+%   \end{figure}
+%   \clearpage
+% }
+
+
+
+
+
+% % \begin{figure}[!h] %#1=ht
+% %   \centering 
+% %   \includegraphics[angle=0, width=0.95\textwidth]{case-iris}
+% %   \caption{Histograms of iris sepal width}
+% %   \label{fig:case-iris}
+% % \end{figure}
+% % \clearpage % Better use FloatBarrier here
+
+
+
+% % \begin{figure}[!h] %#1=ht
+% %   \centering 
+% %   \includegraphics[angle=0, width=0.95\textwidth]{case-iris}
+% %   \caption{Histograms of iris sepal width}
+% %   \label{fig:case-iris}
+% % \end{figure}
+% % \clearpage % Better use FloatBarrier here
+

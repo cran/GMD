@@ -65,7 +65,7 @@ double __mdpa(ARRAY a1, ARRAY a2){
   */
 
   int size=a1.size;
-  int size2=a2.size;
+  // int size2=a2.size;
 
   // // check if equal length
   // if (size2 != size){ 

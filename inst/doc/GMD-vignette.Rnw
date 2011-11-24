@@ -1,0 +1,372 @@
+% -*- mode: noweb; noweb-default-code-mode: R-mode; -*-
+%\VignetteIndexEntry{GMD - Measuring the distance between histograms: case studies and functionality}
+
+
+\documentclass[letterpaper]{article} %8.5 by 11 inches (215.9 mm by 279.4 mm)
+\usepackage{vignette}
+
+%%\DefineVerbatimEnvironment{Scode}{Verbatim}{formatcom={\color{Scode}},fontsize=\small}
+
+\definecolor{Snote}{rgb}{0,0,0}
+\definecolor{Scode}{rgb}{0,0,0.56}
+\definecolor{Sinput}{rgb}{0,0,0}
+\definecolor{Soutput}{rgb}{0,0,0}
+\renewenvironment{Schunk}{\par\begin{minipage}{\textwidth}}{\end{minipage}}
+\DefineVerbatimEnvironment{Snote}{Verbatim}{formatcom={\color{Snote}},fontsize=\tiny}
+\DefineVerbatimEnvironment{Scode}{Verbatim}{formatcom={\color{Scode}},fontsize=\small} 
+\DefineVerbatimEnvironment{Sinput}{Verbatim}{formatcom={\color{Sinput}},fontsize=\scriptsize,baselinestretch=0.9}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{formatcom={\color{Soutput}},fontsize=\scriptsize,baselinestretch=0.85,numbers=none}
+
+
+
+\newcommand{\keywords}[1]{\textbf{Keywords: }#1}
+
+\newcommand{\FALSE}{\texttt{FALSE}}
+\newcommand{\TRUE}{\texttt{TRUE}}
+
+
+\newcommand{\GMD}{\texttt{GMD}}
+\newcommand{\eg}{\textit{e.g.}}
+\newcommand{\elbow}{\texttt{``elbow''}}
+\newcommand{\heatmapthree}{\texttt{heatmap.3}}
+\newcommand{\sliding}{\textit{sliding}}
+
+
+\title{\GMD{} Vignette: \\
+  \begin{minipage}{0.7\textwidth}\centering\large{Generic histogram construction, generic distance measure, cluster analysis with evaluation and visualization}\end{minipage}
+}
+\author{
+Xiaobei Zhao$^{*}$ \quad Albin Sandelin$^{*}$
+\let\thefootnote\relax\footnote{Bioinformatics Centre, University of Copenhagen, 
+  Department of Biology and Biotech Research and Innovation Centre,  
+  Ole Maal\o es Vej 5, DK-2200, Copenhagen, Denmark. Email: xiaobei@binf.ku.dk ; albin@binf.ku.dk}}
+\date{\today}
+
+
+
+\begin{document}
+%% ------------------------------------------------------------------------
+%% Overall Sweave and R options
+%% ------------------------------------------------------------------------
+\SweaveOpts{strip.white=true}
+\SweaveOpts{engine=R,keep.source=TRUE,eps=FALSE,pdf=TRUE}
+\SweaveOpts{prefix=TRUE,prefix.string=GMD-fig,include=TRUE} 
+\SweaveOpts{width=10,height=8}
+\setkeys{Gin}{width=0.75\linewidth}
+
+
+
+%% ------------------------------------------------------------------------
+%% 
+%% ------------------------------------------------------------------------
+\maketitle
+
+ 
+%% ------------------------------------------------------------------------
+%% 
+%% ------------------------------------------------------------------------
+
+\begin{abstract}
+  The purpose of this \GMD{} Vignette is to show how to get up and running with the R package \GMD{}. \textit{GMD} denotes \textbf{Generalized Minimum Distance between histograms}, which is a true metric that measure the distance between the shapes of any two discrete numerical distributions (\eg{} histograms). 
+  
+  The vignette includes a brief introduction, an example to illustrate the concepts and the implementation of \GMD{} and case studies that were carried out with applications using classical data sets (\eg{} \textit{iris}) and high-throughput sequencing data (\eg{} \textit{ChIP-seq}) from biology experiments. The appendix on page \pageref{sec:app} contains an overview of package functionality, and examples using primary functions in histogram construction (the \texttt{ghist} function), distance measuring (the \texttt{gdist} function), cluster analysis with evaluation (the \elbow{} method in the \texttt{css} function) and visualization (the \heatmapthree{} function).\\[3ex]
+  
+  \keywords{histogram, distance, metric, non-parametric, cluster analysis, hierarchical clustering, sum-of-squares, heatmap.3}
+\end{abstract}
+
+
+\vfill
+
+\tableofcontents
+
+\vfill
+
+
+\section{Introduction}
+Similarly to the Earth Mover's distance, \texttt{Generalized Minimum distance of Distributions (GMD)} (based on MDPA - Minimum Difference of Pair Assignment \cite{Cha2002measuring}) is a true metric that measures the similarity of shapes between two histograms $A$ and $B$ by counting the necessary ``shifts'' of elements between bins that have to be performed to transform distribution $A$ into distribution $B$. 
+
+The \texttt{GMD} package provides classes and methods for computing \GMD{} in R \cite{RDevelopmentCoreTeam2011R:}. The algorithm has been implemented in C to interface with R for efficient computation. The package also includes downstream cluster analysis in function \texttt{css} (\ref{md:css} on page \pageref{md:css}) that use a pairwise distance matrix to make partitions given variant criteria, inclusing the ``elbow'' rule as discussed in \cite{Zhao2011Systematic} or desired number of clusters. In addition, the function \texttt{heatmap.3} (\ref{md:heatmap3} on page \pageref{md:heatmap3}) integrates the visualization of the hierarchical clustering in dendrogram, the distance measure in heatmap and graphical representations of summary statistics of the resulting clusters or the overall partition. For more flexibility, the function \texttt{heatmap.3} also takes plugin functions defined by end-users for variant summary statistics.
+
+The motivation to write this package was born with the project \cite{Zhao2011Systematic} on characterizing Transcription Start Site (TSS) landscapes using high-throughput sequencing data, where a non-parametric distance measure was developped to assess the similarity among distributions of high-throughput sequencing reads from biological experiments. 
+
+The package is available on CRAN. The source code is available at \url{http://cran.r-project.org/web/packages/GMD/} under GPL license. 
+
+%% From the package home page, \url{http://sourceforge.net/projects/gm-distance/}, a graph gallery with R code, and the development source tree are available.
+
+
+
+\vspace{2ex}
+\section{Minimal Example: ``Hello, GMD!''}
+\vignetteSource{hello-GMD.R}{}
+\texttt{hello-GMD.R} (fig. \ref{src:hello-GMD.R}) is a minimal example to load and check the sanity of your \GMD{} installation. It also includes code for viewing the package information and this ``Vignette'', checking data sets provided by \GMD{}, starting a demo and listing the citation of \GMD{}.
+
+% % Package \texttt{GMD} is loaded by 
+% % <<echo=TRUE,print=FALSE,results=hide>>= 
+% % library(GMD)
+% % @
+\clearpage
+
+
+\section{An example to understand  GMD}
+This example, based on simulated data, is designed to illustrate the concepts and the implementation of \GMD{} by stepping through the computations in detail. 
+
+\subsection{Histogram: construction and visualization}
+
+<<echo=TRUE,eval=TRUE,results=verbatim,prefix.string=example-GMD>>=
+## ------------------------------------------------------------------------
+## chunk1: Load library and simulate data 
+## ------------------------------------------------------------------------
+require("GMD") # load library
+ 
+## create two normally-distributed samples
+## with unequal means and unequal variances
+set.seed(2012)
+x1 <- rnorm(1000,mean=-5, sd=10)
+x2 <- rnorm(1000,mean=10, sd=5)
+@ 
+
+<<echo=TRUE,eval=TRUE,results=verbatim,prefix.string=example-GMD>>=
+## ------------------------------------------------------------------------
+## chunk2: Construct histograms
+## ------------------------------------------------------------------------
+## create common bins
+n <- 20 # desired number of bins
+breaks <- gbreaks(c(x1,x2),n) # bin boundaries
+
+## make two histograms
+v1 <- ghist(x1,breaks=breaks,digits=0)
+v2 <- ghist(x2,breaks=breaks,digits=0)
+@ 
+
+<<echo=TRUE,eval=TRUE,results=verbatim,prefix.string=example-GMD>>=
+## ------------------------------------------------------------------------
+## chunk3: Save histograms as multiple-histogram (`mhist') object
+## ------------------------------------------------------------------------
+x <- list(v1,v2)
+mhist.obj <- as.mhist(x)
+@ 
+
+<<echo=TRUE,eval=TRUE,results=verbatim,fig=TRUE,prefix.string=example-GMD>>=
+## ------------------------------------------------------------------------
+## chunk4: Visualize a `mhist' object
+## ------------------------------------------------------------------------
+## plot histograms side-by-side
+plot(mhist.obj,mar=c(1.5,1,1,0),main="Histograms of simulated normal distributions")
+@ 
+
+<<echo=TRUE,eval=TRUE,results=verbatim,fig=TRUE,prefix.string=example-GMD>>=
+## plot histograms as subplots, with corresponding bins aligned
+plot(mhist.obj,beside=FALSE,mar=c(1.5,1,1,0),
+     main="Histograms of simulated normal distributions")
+@ 
+
+\subsection{Histogram: distance measure and alignment}
+Here we measure the \textit{GMD} distance between shapes of two histograms with option \sliding{} on.
+
+<<echo=TRUE,eval=TRUE,results=verbatim,prefix.string=example-GMD>>=
+## ------------------------------------------------------------------------
+## chunk5: Measure the pairwise distance betwwen two histograms by GMD
+## ------------------------------------------------------------------------
+gmdp.obj <- gmdp(v1,v2,sliding=TRUE)
+print(gmdp.obj)                       # print a brief version by default
+print(gmdp.obj,print.mode="detailed") # print a detailed version
+print(gmdp.obj,print.mode="full")     # print a full version
+@ 
+
+
+\clearpage
+Now, let's have a look at the alignment by \texttt{GMD}, with a distance $1.334$ and a ``shift'' of $5$ in the $1^{st}$ distribution. It is important to note that the specific features (the values in this case) of the original bins in the histograms are ignored with \sliding{} on. To keep original bin-to-bin correspondence, please set \sliding{} to \FALSE{} (see examples in section \ref{subsec:chipseq} on page \pageref{subsec:chipseq}).
+
+<<echo=TRUE,eval=TRUE,results=verbatim,fig=TRUE,prefix.string=example-GMD>>=
+## ------------------------------------------------------------------------
+## chunk6: Show alignment
+## ------------------------------------------------------------------------
+plot(gmdp.obj,beside=FALSE)
+@ 
+\clearpage
+
+
+
+\section{Case study}
+  
+  
+\subsection{CAGE: measuring the dissimilarities among TSSDs}
+\label{subsec:cage}
+Studies have demonstrated that the spatial distributions of read based sequencing reads from different platforms often indicate functional properties and expression profiles (reviewed in \cite{Sandelin2007Mammalian} and \cite{Zhou2011Charting}). Analyzing the distributions of DNA reads from the different platforms is therefore often meaningful. To do this systematically, a measure of similarity between distributions is necessary. Such measures should ideally be true metrics, have few parameters as possible, be computationally efficient and also make biological sense to end-users. Case studies were made in section \ref{subsec:cage} and \ref{subsec:chipseq} to demanstrate the applicaitons of \GMD{} using distributions of CAGE and ChIP-seq sequencing reads.
+
+In this section we demonstrate how \texttt{GMD} is applied to measure the dissimilarities among TSSDs, histograms of transcription start site (TSS) that are made of CAGE tags, with option \sliding{} on. The spatial properties of TSSDs vary widely between promoters and have biological implications in both regulation and function. The raw data were produced by CAGE and downloaded from FANTOM3 (\cite{Carninci2006Genome-wide}) and CAGE sequence reads were preprocessed as did in \cite{Zhao2011Systematic}. The following codes \texttt{case-cage.R} (fig. \ref{src:case-cage.R}) are sufficient to perform both pairwise GMD calculation by function \texttt{gmdp} and to construct a GMD distance matrix by function \texttt{gmdm}. A handful of options are available for control and flexibility, particularly, the option \texttt{sliding} is enabled by default to allow partial alignment.
+
+\vignetteSource{case-cage.R}{}
+\vignetteFigure{GMD-fig-case-cage-01.pdf}{}{}{1}{case-cage.R}
+\vignetteFigure{GMD-fig-case-cage-01.pdf}{}{}{2}{case-cage.R}
+\vignetteFigure{GMD-fig-case-cage-02.pdf}{}{}{1}{case-cage.R}
+\clearpage
+
+
+\subsection{ChIP-seq: measuring the similarities among histone modification patterns}
+\label{subsec:chipseq}
+In this section we demonstrate how \texttt{GMD} is applied to measure the dissimilarities among histone modifications represented by ChIP-seq reads. Distinctive patterns of chromatin modifications around the TSS are associated with transcription regulation and expression variation of genes. Comparing the chromatin modification profiles (originally produced by \cite{Barski2007High-resolution} and \cite{Mikkelsen2007Genome-wide}, and preprocessed by \cite{Zhao2011Systematic}), the \texttt{sliding} option is disabled for fixed alignments at the TSSs and the flanking regions. The GMD measure indicates how well profiles are co-related to each other. In addition, the downstream cluster analysis is visualized with function \texttt{heatmap.3} that use GMD distance matrix to generate clustering dengdrograms and make partitions given variant criteria, including the \elbow{} rule (discussed in \cite{Zhao2011Systematic}) or desired number of clusters.
+
+\vignetteSource{case-chipseq.R}{}
+\vignetteFigure{GMD-fig-case-chipseq-01.pdf}{}{}{}{case-chipseq.R}
+\vignetteFigure{GMD-fig-case-chipseq-02.pdf}{}{}{}{case-chipseq.R}
+\clearpage
+
+
+
+
+\newpage
+\appendix
+\label{sec:app}
+
+\section[Functionality]{Functionality}\label{app:01}
+\subsection{An overview}
+
+\begin{table}[!h]
+\processtable{Functions of the \texttt{GMD} R package\label{tab:s01}}
+{\begin{tabular}{ll}
+\toprule
+Function & Description\\
+\midrule
+\texttt{ghist} &  Generalized Histogram Computation and Visualization\\
+\texttt{gdist} &  Generalized Distance Matrix Computation\\
+\texttt{css} &  Computing Clustering Sum-of-Squares and \\
+             &  evaluating the clustering by the \elbow{} method\\
+\texttt{heatmap.3} &  Enhanced Heatmap Representation with Dendrogram and Partition\\
+\texttt{gmdp} & Computation of GMD on a pair of histograms \\
+\texttt{gmdm} & Computation of GMD Matrix on a set of histograms \\
+\botrule
+\end{tabular}}
+{} % This is a footnote
+\end{table}
+\clearpage
+
+
+
+\subsection{\texttt{ghist}: Generic construction and visualization of histograms}
+\label{md:ghist}
+\subsubsection{Examples using simulated data}
+\texttt{example-ghist.R} (fig. \ref{src:example-ghist.R}) is an example on how to obtain histogram from raw data and make visualization.
+\vignetteSource{example-ghist.R}{}
+\vignetteFigure{GMD-fig-example-ghist-01.pdf}{}{}{}{example-ghist.R}
+\vignetteFigure{GMD-fig-example-ghist-02.pdf}{}{}{}{example-ghist.R}
+\clearpage
+\subsubsection{Examples using \texttt{iris} data}
+\texttt{case-iris.R} (fig. \ref{src:case-iris.R}) is a study on how to obtain and visualize histograms, using Fisher's \textit{iris} data set.
+\vignetteSource{case-iris.R}{}
+\vignetteFigure{GMD-fig-case-iris-01.pdf}{}{}{}{case-iris.R}
+\clearpage
+
+
+\subsubsection{Examples using \texttt{nottem} data}
+\texttt{case-nottem.R} (fig. \ref{src:case-nottem.R}) is a study on how to draw histograms side-by-side and to compute and visualize a bin-wise summary histogram, using air temperature data at Nottingham Castle.
+
+\vignetteSource{case-nottem.R}{}
+\vignetteFigure{GMD-fig-case-nottem-01.pdf}{}{}{1}{case-nottem.R}
+\vignetteFigure{GMD-fig-case-nottem-01.pdf}{}{}{2}{case-nottem.R}
+\clearpage
+
+
+
+\subsection{\texttt{gdist}: Generic construction and visualization of distances}
+\label{md:gdist}
+\texttt{example-gdist.R} (fig. \ref{src:example-gdist.R}) is an example on how to measure distances using user-defined metric, such as \textit{correlation distance} and \textit{GMD}.
+\vignetteSource{example-gdist.R}{}
+\vignetteFigure{GMD-fig-example-gdist-01.pdf}{}{}{1}{example-gdist.R}
+\vignetteFigure{GMD-fig-example-gdist-01.pdf}{}{}{2}{example-gdist.R}
+
+\clearpage
+
+\subsection[\texttt{css}: Clustering Sum-of-Squares and the \elbow{} plot]{\texttt{css}: Clustering Sum-of-Squares and the \elbow{} plot: determining the number of clusters in a data set}
+\label{md:css}
+A good clustering yields clusters where the total within-cluster sum-of-squares (WSSs) is small (i.e. cluster cohesion, measuring how closely related are objects in a cluster) and the total between-cluster sum-of-squares (BSSs) is high (i.e. cluster separation, measuring how distinct or well-separated a cluster is from other clusters).
+\texttt{example-css.R} (fig. \ref{src:example-css.R}) is an example on how to make correct choice of $k$ using \textbf{``elbow criterion''}. A good $k$ is selected according to the thresholds of explained variances and the changes of the explained variances. The optimal choice of $k$ will strike a balance between maximum compression of the data using a single cluster, and maximum accuracy by assigning each data point to its own cluster. More important, an ideal $k$ should also reflect subject-specific meanings. Here we present a way to measure such performance of a clustering model, using squared Euclidean distances. The evaluation is based on pairwise distance matrix and therefore more generic in a way that doesn't involve means of raw data, which are often not available or hard to obtain.
+\vignetteSource{example-css.R}{}
+\vignetteFigure{GMD-fig-example-css-01.pdf}{}{}{1}{example-css.R}
+\vignetteFigure{GMD-fig-example-css-01.pdf}{}{}{2}{example-css.R}
+
+\clearpage
+
+\subsection{\heatmapthree{}: Visualization in cluster analysis with evaluation}
+\label{md:heatmap3}
+\subsubsection{Examples using \texttt{mtcars} data}
+\texttt{example-heatmap3a.R} (fig. \ref{src:example-heatmap3a.R}) is an example on how to make a heatmap with summary visualization of observations.
+\vignetteSource{example-heatmap3a.R}{}
+\vignetteFigure{GMD-fig-example-heatmap3a-01.pdf}{}{}{1}{example-heatmap3a.R}
+\vignetteFigure{GMD-fig-example-heatmap3a-01.pdf}{}{}{2}{example-heatmap3a.R}
+\vignetteFigure{GMD-fig-example-heatmap3a-01.pdf}{}{}{3}{example-heatmap3a.R}
+\vignetteFigure{GMD-fig-example-heatmap3a-01.pdf}{}{}{4}{example-heatmap3a.R}
+
+\clearpage
+
+
+\subsubsection{Examples using \texttt{ruspini} data}
+\texttt{example-heatmap3b.R} (fig. \ref{src:example-heatmap3b.R}) is an example on how to make a heatmap with summary visualization of clusters.
+\vignetteSource{example-heatmap3b.R}{}
+\vignetteFigure{GMD-fig-example-heatmap3b-01.pdf}{}{}{1}{example-heatmap3b.R}
+
+\clearpage
+
+
+
+\section{Data}\label{app:02}
+\subsection{GMD dataset overview}
+
+<<echo=TRUE,eval=FALSE>>=
+data(package="GMD")
+@
+
+\begin{Schunk}
+\begin{Soutput}
+Data sets in package 'GMD':
+
+cage                    CAGE Data
+cagel                   CAGE Data
+chipseq_hCD4T           ChIP-seq Data
+chipseq_mES             ChIP-seq Data
+\end{Soutput}
+\end{Schunk}
+
+
+\subsection{CAGE data: cage and cagel}
+
+<<echo=TRUE,eval=FALSE>>=
+help(cage)
+@
+
+<<echo=TRUE,eval=TRUE,results=verbatim,prefix.string=example-GMD>>=
+data(cage)
+class(cage)
+length(cage)
+names(cage)
+
+data(cagel)
+names(cagel)
+@ 
+
+\subsection{ChIP-seq data: chipseq\_mES and chipseq\_hCD4T}
+
+<<echo=TRUE,eval=FALSE>>=
+help(chipseq)
+@ 
+
+<<echo=TRUE,eval=TRUE,results=verbatim,prefix.string=example-GMD>>=
+data(chipseq_mES)
+class(chipseq_mES)
+length(chipseq_mES)
+names(chipseq_mES)
+
+data(chipseq_hCD4T)
+names(chipseq_hCD4T)
+@ 
+
+
+
+\clearpage
+\bibliographystyle{plain}
+\bibliography{GMD}
+
+
+\end{document}
+
+

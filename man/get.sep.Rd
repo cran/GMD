@@ -1,0 +1,8 @@
+\name{get.sep}
+\alias{get.sep}
+\title{Get row or column lines of separation for heatmap.3}
+\usage{get.sep(clusters, type=c("row", "column", "both"))}
+\description{Get row or column lines of separation for \code{heatmap.3} according to clusters}
+\details{Get row or column lines of separation for \code{heatmap.3} according to clusters}
+\arguments{\item{clusters}{a numerical vector, indicating the cluster labels of observations.}
+\item{type}{string, one of the following: \code{c("row","column","both")}}}
