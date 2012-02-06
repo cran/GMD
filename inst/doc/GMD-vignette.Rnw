@@ -12,6 +12,7 @@
 \definecolor{Sinput}{rgb}{0,0,0}
 \definecolor{Soutput}{rgb}{0,0,0}
 \renewenvironment{Schunk}{\par\begin{minipage}{\textwidth}}{\end{minipage}}
+
 \DefineVerbatimEnvironment{Snote}{Verbatim}{formatcom={\color{Snote}},fontsize=\tiny}
 \DefineVerbatimEnvironment{Scode}{Verbatim}{formatcom={\color{Scode}},fontsize=\small} 
 \DefineVerbatimEnvironment{Sinput}{Verbatim}{formatcom={\color{Sinput}},fontsize=\scriptsize,baselinestretch=0.9}
@@ -66,7 +67,7 @@ Xiaobei Zhao$^{*}$ \quad Albin Sandelin$^{*}$
 %% 
 %% ------------------------------------------------------------------------
 \maketitle
-<<echo=FALSE,eval=TRUE,results=tex,prefix.string=example-GMD,just="center">>=
+<<echo=FALSE,eval=TRUE,results=tex,prefix.string=example-GMD>>=
   cat(sprintf("\\begin{center}{\\Large \\textbf{(Version: %s)}}\\end{center}",packageVersion("GMD")))
 @ 
 

@@ -1,3 +1,9 @@
+Changes in Version 0.3.1.1
+--- --- --- --- --- --- --- --- --- --- --- --- 
+    o Fixed an option to produce the vignette. 
+      (## removed `just=center' in one of the Sweave's code chunks)
+
+
 Changes in Version 0.3.1
 --- --- --- --- --- --- --- --- --- --- --- --- 
     o added .Rinstignore.
