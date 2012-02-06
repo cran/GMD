@@ -165,7 +165,8 @@ as.mhist <-
 
   if (is.null(bins)){
     bins <- 1:n
-    warning("`bins' are not specified; use automatic numbering instead under assumption that memeber histograms have the same order of bins.")
+    warning("`bins' are not specified; use automatic numbering instead under assumption
+that memeber histograms have the same order of the bins.")
   }
   
   if(!all(sapply(x, is.numeric))){
@@ -226,6 +227,10 @@ equalize.list <-
 ##'
 ##' Given a list, matrix or data.frame of histograms, plot multiple histograms side-by-side or as subplots.
 ##' @title S3 method for class `plot.mhist'.
+##' 
+##' @method plot mhist
+##' @S3method plot mhist
+##' 
 ##' @param x a numeric matrix or data frame, representing distributions by rows (bins by columns); or a list of numeric vectors as distributions. 
 ##' @param beside logical, whether plot histograms side-by-side.
 ##' @param labels a string vector of labels for the histograms in \code{x};
@@ -432,7 +437,8 @@ plot.mhist <-
   } else if (is.na(xticks)) {
     x.at <- x.labels <- NULL
   } 
-  
+
+  ##print(x.at)
   y.at <- pretty(ylim)
 
   ##par
@@ -461,8 +467,12 @@ plot.mhist <-
     mtext(line=2,side=3,text=main,outer=FALSE,cex=cex.main,adj=0) # main title
     mtext(line=0.55,side=3,text=sub,outer=FALSE,cex=cex.sub,adj=0) # subtitle
 
-    axis(side=1, at=x.at, labels=x.labels, cex.axis=cex.tickmark,las=x.las)
-    axis(2, at=y.at, cex.axis=cex.tickmark, las=1)
+    ##print(x.at)
+    if (!is.null(x.at))
+      axis(side=1, at=x.at, labels=x.labels, cex.axis=cex.tickmark,las=x.las)
+    
+    if (!is.null(y.at))
+      axis(2, at=y.at, cex.axis=cex.tickmark, las=1)
     
     bottoms <- 0
     bottoms <- matrix(bottoms, nrow=M, ncol=N)
@@ -513,8 +523,13 @@ plot.mhist <-
            cex.lab=cex.lab,
            ...
            )
-      axis(side=1, at=x.at, labels=x.labels, cex.axis=cex.tickmark,las=x.las)
-      axis(2, at=y.at, cex.axis=cex.tickmark, las=1)
+      
+      ##print(x.at)
+      if (!is.null(x.at))
+        axis(side=1, at=x.at, labels=x.labels, cex.axis=cex.tickmark,las=x.las)
+      
+      if (!is.null(y.at))
+        axis(2, at=y.at, cex.axis=cex.tickmark, las=1)
       
       bottoms <- 0
       bottoms <- matrix(bottoms, nrow=M, ncol=1)
@@ -569,11 +584,13 @@ plot.mhist <-
 ##' Bin-wise summary of a \code{mhist} object of histograms
 ##' @name mhist.summary
 ##' @aliases mhist.summary plot.mhist.summary
+##' 
 ##' @title Bin-wise summary of histograms
+##' 
 ##' @usage
 ##' mhist.summary(h, ...)
-##'
-##' plot.mhist.summary(x,bins,plot.ci=TRUE,col=NULL,
+##' 
+##' \method{plot}{mhist.summary}(x,bins,plot.ci=TRUE,col=NULL,
 ##' ci.color="orchid1",tcl=-0.25,omi=c(0.5,0.5,1.0,0.25),mar=c(3,3,3,1),
 ##' mgp=c(2,0.5,0),if.plot.new=TRUE,...)
 ##' 
@@ -632,6 +649,10 @@ mhist.summary <-
 ##'
 ##' Plot bin-wise summaries of histograms
 ##' @title S3 method for class `mhist.summary'
+##' 
+##' @method plot mhist.summary
+##' @S3method plot mhist.summary
+##' 
 ##' @param x a \code{mhist.summary} object as produced by \code{mhist.summary}
 ##' @param bins character vecter, the bin labels; if non-specific, bins are numbered/labeled starting with one.
 ##' @param plot.ci logical, indicating whether plot error bars that represent

@@ -4,7 +4,8 @@
 ## 
 ## AUTHOR: Xiaobei ZHAO <xiaobei _at_ binf.ku.dk>
 ## 
-## DATE: Fri Nov 18 02:30:01 CET 2011
+## v0.3.1 Sat Feb 04 16:13:09 CET 2012
+## v0.3   Fri Nov 18 02:30:01 CET 2011
 ##
 ## DESCRIPTION:
 ## The R package \code{GMD} source code is available at
@@ -390,8 +391,11 @@ heatmap.3 <-
            ...
            )
 {
+
   ## store input
   x.ori <- x
+  Rowv.ori <- Rowv
+  Colv.ori <- Colv
   
   ## check input - take1 ##
   if(!inherits(x,"dist") & !is.matrix(x)){
@@ -409,7 +413,8 @@ heatmap.3 <-
 ##     Colv <- FALSE
 ##   }
 
-  if (identical(Rowv, FALSE) | invalid(Rowv)){
+  
+  if (identical(Rowv, FALSE) | missing(Rowv)){
     if(!identical(cluster.by.row,FALSE)){
       warning("Discrepancy: No row dendrogram is asked; cluster.by.row is set to `FALSE'.")
       cluster.by.row <- FALSE
@@ -432,7 +437,6 @@ heatmap.3 <-
       cluster.by.col <- TRUE
     }
   }
-
   
   if (!invalid(kr)){
     if (is.numeric(kr)){
@@ -494,6 +498,8 @@ heatmap.3 <-
 
   ## check input - take2: di ##
   di <- dim(x)
+  cat("1.dim(x):",dim(x),"\n")
+  
   if(length(di)!=2 || !is.numeric(x)){
     stop("`x' should only contain `numeric' values and can be converted to a 2-D matrix.")
   }
@@ -535,13 +541,11 @@ heatmap.3 <-
   ## cellnote ##
   ## ##if(invalid(cellnote)) cellnote <- matrix("",ncol=ncol(x),nrow=nrow(x))
 
-
-  
   ## ------------------------------------------------------------------------
   ## parse dendrogram ##
   ## ------------------------------------------------------------------------  
   
-  if (invalid(Rowv)) Rowv <- FALSE
+  if (missing(Rowv)) Rowv <- FALSE
   
   if (invalid(Colv)) Colv <- if(symm) Rowv else FALSE
   if (Colv=="Rowv") {
@@ -594,7 +598,6 @@ heatmap.3 <-
   ## generate hclust.obj - row/col
   ## ------------------------------------------------------------------------
   cat("Preparing `dendrogram'... ")
-  flush.console()
 
   ddr <- ddc <- NULL
   ## get the dendrograms and reordering row/column indices - row ##
@@ -612,6 +615,7 @@ heatmap.3 <-
       stop("`rowInd' is of wrong length.")
     }
   } else if (isTRUE(Rowv)){ ## if TRUE,compute dendrogram and do reordering based on rowMeans
+
     Rowv <- rowMeans(x,na.rm=TRUE)
     ddr <- as.dendrogram(hclust.row)
     ddr <- reorder(ddr,Rowv)
@@ -622,7 +626,7 @@ heatmap.3 <-
   } else{
     rowInd <- nr:1 ## from bottom.
   }
-
+  
   ## get the dendrograms and reordering row/column indices - col ##
   if(inherits(Colv,"dendrogram")){
     if (attr(Colv,"members") != nc){
@@ -654,31 +658,35 @@ heatmap.3 <-
     colInd <- 1:nc ## from left
   }
 
-
+  
   
   ## ------------------------------------------------------------------------
   ## check consistency
   ## ------------------------------------------------------------------------
+
+  
   ## dendrogram - check consistency: Rowv ##
   if ( is.null(ddr) & (dendrogram %in% c("both","row"))){
     warning("Discrepancy: Rowv is invalid or FALSE, while dendrogram is `",
             dendrogram,"'. Omitting row dendogram.")
-    if (is.logical(Colv) & (Colv) & dendrogram=="both")
+    if (is.logical(Colv) & (Colv.ori) & dendrogram=="both")
       dendrogram <- "column"
     else
       dendrogram <- "none"
   }
 
+  
   ## dendrogram - check consistency: Colv ##
   if ( is.null(ddc) & (dendrogram %in% c("both","column"))){
     warning("Discrepancy: Colv is invalid or FALSE, while dendrogram is `",
             dendrogram,"'. Omitting column dendogram.")
-    if (is.logical(Rowv) & (Rowv) & dendrogram=="both")
+    if (is.logical(Rowv) & (identical(Rowv.ori,TRUE) | is.numeric(Rowv.ori) | inherits(Rowv.ori,"dendrogram")) & dendrogram=="both")
       dendrogram <- "row"
     else
       dendrogram <- "none"
   }
 
+  
   ## check consistency
   if (is.null(ddr)){
     if(isTRUE(cluster.by.row) | isTRUE(plot.row.partition) | isTRUE(plot.row.clusters) | isTRUE(plot.row.clustering) ){
@@ -707,6 +715,9 @@ heatmap.3 <-
   flush.console()
   ## reorder x and cellnote ##
   x <- x[rowInd,colInd]
+  
+  cat("2.dim(x):",dim(x),"\n")
+  
   if (!invalid(cellnote)) cellnote <- cellnote[rowInd,colInd]
   
   ## reorder labels - row ##
@@ -737,8 +748,9 @@ heatmap.3 <-
   cat("Scaling ... ")
   flush.console()
   x <- .scale.data(x,scale,na.rm)
+  cat("3.dim(x):",dim(x),"\n")
 
-  
+
   ## ------------------------------------------------------------------------
   ## labels for observations/clusters/
   ## ------------------------------------------------------------------------
@@ -825,6 +837,8 @@ heatmap.3 <-
   x[] <- ifelse(x>max.breaks,max.breaks,x)
 
   
+  cat("4.dim(x):",dim(x),"\n")
+  
   ## ------------------------------------------------------------------------
   ## check if it is sufficient to draw side plots ##
   ## ------------------------------------------------------------------------
@@ -884,7 +898,8 @@ heatmap.3 <-
     print(sprintf("kr=%s,kc=%s",kr,kc))
     flush.console()
   }
-
+  
+  cat("5.dim(x):",dim(x),"\n")
   
   ## ------------------------------------------------------------------------
   ## Plotting
@@ -1103,6 +1118,10 @@ heatmap.3 <-
 
     
     ## reverse columns
+    cat("revC:",revC,", revR:",revR,"\n")
+
+    cat("5b.dim(x):",dim(x),"\n")
+    
     if(revC){ ## x columns reversed
       iy <- nr:1
       ddc <- rev(ddc)
@@ -1122,16 +1141,25 @@ heatmap.3 <-
       ix <- 1:nc
     }
 
+    
+    cat("5c.dim(x):",dim(x),"\n")
+    
     ## 1) draw the main carpet/heatmap
     margins <- c(margin.for.labCol,0,0,margin.for.labRow)
     mgp <- c(3,1,0)
     par(mar=margins,mgp=mgp);outer=FALSE
     ##par(oma=margins,mar=c(0,0,0,0),mgp=c(0,0,0));outer=TRUE
-    if(!symm || scale !="none"){
+
+    
+    cat("scale:",scale,"\n")
+    x.save <- x
+    if(!symm || scale !="none"){ ##??
       x <- t(x)
       if (!invalid(cellnote)) cellnote <- t(cellnote)
     }
 
+    cat("5d.dim(x):",dim(x),"\n")
+    
     
     ## cat(sprintf("heatmap:mar=c(%s)\n",paste(par("mai"),sep="",collapse=",")))
     image(1:nc,1:nr,
@@ -1206,11 +1234,15 @@ heatmap.3 <-
       }
     }
     
-    
+        
     ## show traces
     min.scale <- min(breaks)
     max.scale <- max(breaks)
+    
+    cat("6.dim(x):",dim(x),"\n")
     x.scaled  <- .scale.x(t(x),min.scale,max.scale)
+    cat("7.dim(x):",dim(x),"\n")
+  
     if(invalid(hline)) hline=median(breaks)
     if(invalid(vline)) vline=median(breaks)
     
@@ -1524,10 +1556,11 @@ heatmap.3 <-
     }
  
   }
+  cat("8.dim(x):",dim(x),"\n")
   
   ret <-
     list(x.ori=x.ori,
-         x=x,
+         x=x.save,
          rowInd=rowInd,colInd=colInd,
          row.clusters=row.clusters,col.clusters=col.clusters,
          dist.row=dist.row,dist.col=dist.col,

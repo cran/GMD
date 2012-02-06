@@ -1,5 +1,3 @@
-
-
 ## TSS: total sum of squares
 ## BSS: between cluster sum of squares
 ## WSS: within cluster sum of squares
@@ -276,17 +274,17 @@ css.hclust <-
 ##' @title The "Elbow" Method for Clustering Evaluation
 ##' @name elbow
 ##' @aliases elbow elbow.batch plot.elbow
+##' 
 ##' @usage
-##' ## find a "good" k given thresholds of EV and its increment.
+##' ## find a good k given thresholds of EV and its increment.
 ##' elbow(x,inc.thres,ev.thres,precision=3,print.warning=TRUE)
 ##'
-##' ## a wrapper of `elbow' testing multiple threshold to find a "good" k.
+##' ## a wrapper of `elbow' testing multiple thresholds.
 ##' elbow.batch(x,inc.thres=c(0.01,0.05,0.1),
 ##' ev.thres=c(0.95,0.9,0.8,0.75,0.67,0.5,0.33),precision=3)
 ##'
-##' ## S3 mathod for class `elbow'
-##' plot.elbow(x,elbow.obj,main,xlab="k",
-##' ylab="Explained Variance",type="b",pch=20,col.abline="red",
+##' \method{plot}{elbow}(x,elbow.obj=NULL,main,xlab="k",
+##' ylab="Explained_Variance",type="b",pch=20,col.abline="red",
 ##' lty.abline=3,if.plot.new=TRUE,print.info=TRUE,
 ##' mar=c(4,5,3,3),omi=c(0.75,0,0,0),...)
 ##' 
@@ -366,7 +364,7 @@ css.hclust <-
 ##' par(mfcol=c(1,2),mar=c(4,5,3,3),omi=c(0.75,0,0,0))
 ##' plot(mydata$x,mydata$y,pch=as.character(mydata$cluster),
 ##' col=mydata$cluster,cex=0.75,main="Clusters of simulated data")
-##' plot.elbow(css.obj,elbow.obj,if.plot.new=FALSE)
+##' plot(css.obj,elbow.obj,if.plot.new=FALSE)
 ##' 
 ##' ## clustering with more relaxed thresholds (, resulting a smaller "good" k)
 ##' elbow.obj2 <- elbow.batch(css.obj,ev.thres=0.90,inc.thres=0.05)
@@ -376,7 +374,7 @@ css.hclust <-
 ##' par(mfcol=c(1,2), mar=c(4,5,3,3),omi=c(0.75,0,0,0))
 ##' plot(mydata$x,mydata$y,pch=as.character(mydata$cluster2),
 ##' col=mydata$cluster2,cex=0.75,main="Clusters of simulated data")
-##' plot.elbow(css.obj,elbow.obj2,if.plot.new=FALSE)
+##' plot(css.obj,elbow.obj2,if.plot.new=FALSE)
 elbow <-
   function(x,inc.thres,ev.thres,precision=3,print.warning=TRUE)
 {
@@ -458,13 +456,16 @@ elbow.batch <-
 }
 
 
+
+##' @method plot elbow
+##' @S3method plot elbow
 plot.elbow <- 
   function(x,
-           elbow.obj,
+           elbow.obj=NULL,
            ## plot
            main,
            xlab="k",
-           ylab="Explained Variance",
+           ylab="Explained_Variance",
            type="b",
            pch=20,
            col.abline="red",
@@ -480,12 +481,6 @@ plot.elbow <-
     stop("`x' should be an object of class `css.multi'.")
   }
 
-  if (!inherits(elbow.obj,"elbow") ){
-    stop("`elbow.obj' should be an object of class `elbow'.")
-  }
-
-  k <- elbow.obj$k
-  
   if (invalid(main)){
     main <- "Elbow plot"
   }
@@ -495,14 +490,26 @@ plot.elbow <-
     par(mar=mar,omi=omi)
   }
   plot(x$k,x$ev,type=type,pch=pch,main=main,xlab=xlab,ylab=ylab,...)
-  abline(v=k,col=col.abline,lty=lty.abline)
-  mtext(side=3,at=k,text=sprintf("k=%s",k),line=0)
-  abline(h=x[x$k==k,"ev"],col=col.abline,lty=lty.abline)
-  ##mtext(side=4,at=x[x$k==k,"ev"],text=sprintf("%.2f",x[x$k==k,"ev"]),line=-0.25,col=col.abline,las=2)
-  text(x=x[x$k==k,"k"],y=x[x$k==k,"ev"],labels=sprintf("%.2f",x[x$k==k,"ev"]),col=col.abline,pos=c(2,3))
+
+  if(!is.null(elbow.obj)){
+    if (!inherits(elbow.obj,"elbow") ){
+      stop("`elbow.obj' should be an object of class `elbow'.")
+    }
+    k <- elbow.obj$k
+    abline(v=k,col=col.abline,lty=lty.abline)
+    mtext(side=3,at=k,text=sprintf("k=%s",k),line=0)
+    abline(h=x[x$k==k,"ev"],col=col.abline,lty=lty.abline)
+    ##mtext(side=4,at=x[x$k==k,"ev"],text=sprintf("%.2f",x[x$k==k,"ev"]),line=-0.25,col=col.abline,las=2)
+    text(x=x[x$k==k,"k"],y=x[x$k==k,"ev"],labels=sprintf("%.2f",x[x$k==k,"ev"]),col=col.abline,pos=c(2,3))
+    print.info <- FALSE
+  }
   
   if (print.info){
     title(main="",sub=sub,font.sub=3,cex=0.5,outer=TRUE,line=2.5)
   }
   
 }
+
+
+
+

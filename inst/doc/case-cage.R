@@ -4,7 +4,7 @@ data(cage)     # load data
 ## measure pairwise distance
 x <- gmdp(cage[["Pfkfb3 (T02R00AEC2D8)"]],cage[["Csf1 (T03R0672174D)"]])
 print(x)                     # print a brief version by default
-print(x, print.mode="full")  # print a full version by default
+print(x, mode="full")  # print a full version by default
 
 ## show alignment
 plot(x,labels=c("Pfkfb3","Csf1"),beside=FALSE)

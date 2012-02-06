@@ -1,0 +1,39 @@
+useDynLib(GMD)
+
+export(ghist)
+export(gbreaks)
+
+export(is.ghist)
+export(as.ghist)
+export(is.mhist)
+export(as.mhist)
+export(mhist2matrix)
+export(equalize.list)
+export(mhist.summary)
+
+export(gdist)
+export(is.dist)
+
+export(css)
+export(css.hclust)
+export(elbow)
+export(elbow.batch)
+
+export(gmdp)
+export(gmdm)
+export(gmdm2dist)
+export(gmdm_dist)
+
+export(heatmap.3)
+
+
+S3method(plot,    mhist)
+S3method(plot,    mhist.summary)
+
+S3method(plot,    elbow)
+
+S3method(print,   gmdp)
+S3method(summary, gmdp)
+S3method(plot,    gmdp)
+S3method(print,   gmdm)
+S3method(plot,    gmdm)

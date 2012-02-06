@@ -56,9 +56,9 @@ void initializeArray(ARRAY a, double d);
 double minAarray(ARRAY a);
 void normalizeArray_inplace(ARRAY a);
 void prefixsumArray(ARRAY a, ARRAY res);
-void printARRAYINT(ARRAYINT a);
-void printARRAY(ARRAY a);
-void printARRAY_2D(ARRAY_2D a);
+// void printARRAYINT(ARRAYINT a);
+// void printARRAY(ARRAY a);
+// void printARRAY_2D(ARRAY_2D a);
 void subArrayWithArray(ARRAY a1, ARRAY a2, ARRAY res);
 double sumArray(ARRAY a);
 
@@ -186,68 +186,68 @@ void prefixsumArray(ARRAY a, ARRAY res){
 }
 
 
-void printARRAYINT(ARRAYINT a){
-  /* 
-     print an `ARRAYINT` of "int" elements, 
-     seperate by sep
-  */
-  char* sep=", "; //default argument
-  int i;
+// void printARRAYINT(ARRAYINT a){
+//   /* 
+//      print an `ARRAYINT` of "int" elements, 
+//      seperate by sep
+//   */
+//   char* sep=", "; //default argument
+//   int i;
 
-  // start with "["
-  printf("%c",'[');
+//   // start with "["
+//   printf("%c",'[');
 
-  // the vector
-  for(i=0;i<a.size;i++){
-    printf("%d%s",*a.p++,sep);
-  }
+//   // the vector
+//   for(i=0;i<a.size;i++){
+//     printf("%d%s",*a.p++,sep);
+//   }
 
-  // end with "]"
-  printf("%c%c",']','\n');
-  printf(", with legnth: %d",a.size);
-  printf("\n");
-}
-
-
-void printARRAY(ARRAY a){
-  /* 
-     print an `ARRAY` of "double" elements, 
-     seperate by sep
-  */
-  char* sep=", "; //default argument
-  double* a_p=a.p;
-  int i;
-  printf("%c",'[');
-  for(i=0;i<a.size;i++){
-    printf("%lg",*a_p++);
-    printf("%s",sep);
-  }
-  printf("%c%c",']','\n');
-  printf(", with legnth: %d",a.size);
-  printf("\n");
-}
+//   // end with "]"
+//   printf("%c%c",']','\n');
+//   printf(", with legnth: %d",a.size);
+//   printf("\n");
+// }
 
 
-void printARRAY_2D(ARRAY_2D a){
-  // print an 2D array of "double" elements, seperate by sep
-  //char* sep=" "; //default argument
-  char* sep=", "; //default argument
-  int i,j;
-  printf("[\n");
-  for (i=0;i<a.row;i++){
-    printf("[");
-    for (j=0;j<a.col;j++){
-      //intPrint(i);
-      //intPrint(j);
-      printf("%lg",a.p[i][j]);
-    printf("%s",sep);
-    }
-    printf("], \n");
-  }
-  printf("]\n");
-  printf(", with row by col: %d x %d",a.row,a.col);
-  printf("\n");
-}
+// void printARRAY(ARRAY a){
+//   /* 
+//      print an `ARRAY` of "double" elements, 
+//      seperate by sep
+//   */
+//   char* sep=", "; //default argument
+//   double* a_p=a.p;
+//   int i;
+//   printf("%c",'[');
+//   for(i=0;i<a.size;i++){
+//     printf("%lg",*a_p++);
+//     printf("%s",sep);
+//   }
+//   printf("%c%c",']','\n');
+//   printf(", with legnth: %d",a.size);
+//   printf("\n");
+// }
+
+
+// void printARRAY_2D(ARRAY_2D a){
+//   // print an 2D array of "double" elements, seperate by sep
+//   //char* sep=" "; //default argument
+//   char* sep=", "; //default argument
+//   int i,j;
+//   printf("[\n");
+//   for (i=0;i<a.row;i++){
+//     printf("[");
+//     for (j=0;j<a.col;j++){
+//       //intPrint(i);
+//       //intPrint(j);
+//       printf("%lg",a.p[i][j]);
+//     printf("%s",sep);
+//     }
+//     printf("], \n");
+//   }
+//   printf("]\n");
+//   printf(", with row by col: %d x %d",a.row,a.col);
+//   printf("\n");
+// }
 
 
 void subArrayWithArray(ARRAY a1, ARRAY a2, ARRAY res) {

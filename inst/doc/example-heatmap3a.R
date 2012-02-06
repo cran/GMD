@@ -28,8 +28,8 @@ heatmap.3(x, scale="column", ColIndividualColors=rainbow(ncol(x)))
 
 ## add a single plot for all row individuals 
 dev.new(width=12,height=8)
-expr1 <- list(quote(plot(row.data[rowInd,"hp"],1:nrow(row.data),xlab="hp",ylab="",yaxt="n",
-                         main="Gross horsepower")),
+expr1 <- list(quote(plot(row.data[rowInd,"hp"],1:nrow(row.data),xlab="hp",ylab="",
+                         main="Gross horsepower",yaxt="n")),
               quote(axis(2,1:nrow(row.data),rownames(row.data)[rowInd],las=2)))
 heatmap.3(x, scale="column", plot.row.individuals=TRUE, row.data=x,
           plot.row.individuals.list=list(expr1))

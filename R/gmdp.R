@@ -24,12 +24,10 @@
 ##' gmdp(v1, v2, labels=c("v1","v2"), pseudocount=0, sliding=TRUE,
 ##' resolution=1)
 ##'
-##' ## S3 method for class `gmdp'
-##' print.gmdp(x, print.mode=c("brief","detailed","full"),
+##' \method{print}{gmdp}(x, mode=c("brief","detailed","full"),
 ##' digits=3, ...)
 ##'
-##' ## S3 method for class `gmdp'
-##' summary.gmdp(object, ...)
+##' \method{summary}{gmdp}(object, ...)
 ##'
 ##' 
 ##' @param v1 a numeric vector, giving positional counts as a discrete distribution.
@@ -44,7 +42,7 @@
 ##' but missing details.
 ##' @param x an object of class \code{gmdp}.
 ##' @param object an object of class \code{gmdp}.
-##' @param print.mode a string of the following: \code{c("brief","detailed","full")},
+##' @param mode a string of the following: \code{c("brief","detailed","full")},
 ##' indicating whether to print in \emph{full} mode (\emph{default}). 
 ##' @param digits integer, indicating the number of decimal places to be printed.
 ##' @param ... arguments to be passed to method.
@@ -72,7 +70,7 @@
 ##' 
 ##' n.hit: numeric, the number of (equally good) optimal hits
 ##' @references See \code{citation("GMD")}
-##' @seealso \code{\link{print.gmdp}}, \code{\link{summary.gmdp}}, \code{\link{plot.gmdp}},
+##' @seealso \code{\link{print.gmdp}}, \code{\link{summary.gmdp}}, \code{\link{plot.gmdp}}
 ##' \code{\link{gmdm}} 
 ##' @keywords classes
 ##' @examples
@@ -158,24 +156,26 @@ Otherwise, please allow `sliding` (sliding=TRUE).\n"
 ##'
 ##' Print Function for Class \code{gmdp}
 ##' @title Print Function for class gmdp
+##' @method print gmdp
+##' @S3method print gmdp
 ##' @param x an object of class \code{gmdp}.
-##' @param print.mode a string, indicating whether to print in \emph{full} mode (\emph{default}). 
+##' @param mode a string, indicating whether to print in \emph{full} mode (\emph{default}). 
 ##' @param digits integer, indicating the number of decimal places to be printed.
 ##' @param ... arguments to be passed to methods, see \code{print}.
 ##' @seealso \code{\link{gmdp}}
 ##' @references See \code{help(GMD)}
-print.gmdp <- function(x, print.mode=c("brief","detailed","full"), digits=3, ...)
+print.gmdp <- function(x, mode=c("brief","detailed","full"), digits=3, ...)
 {
   if (!.is.gmdp(x)){
     stop("`x' should be an object of class `gmdp'.")
   }
-  print.mode <- match.arg(print.mode)
+  mode <- match.arg(mode)
 
-  if (print.mode=="brief"){
+  if (mode=="brief"){
     attr(x,"meta") <- c()
     class(x) <- class(x)[class(x)!="gmdp"]
     print(x, ...)
-  } else if (print.mode=="detailed" | print.mode=="full"){
+  } else if (mode=="detailed" | mode=="full"){
     x.meta <- attr(x,"meta")
     s.gap <-
       paste(sprintf("\t%s\t%s\n",x.meta$labels[1],x.meta$labels[2]),
@@ -187,7 +187,7 @@ print.gmdp <- function(x, print.mode=c("brief","detailed","full"), digits=3, ...
             sep=""
             )
     cat("\n")
-    if (print.mode=="full"){
+    if (mode=="full"){
       cat(sprintf("Distribution of %s:\n%s\n",x.meta$labels[1],paste(round(x.meta$v1.ori,digits),sep="",collapse=" ")))
       cat(sprintf("(After normalization)\n%s\n\n",paste(round(x.meta$v1,digits),sep="",collapse=" ")))
       cat(sprintf("Distribution of %s:\n%s\n",x.meta$labels[2],paste(round(x.meta$v2.ori,digits),sep="",collapse=" ")))
@@ -209,6 +209,8 @@ print.gmdp <- function(x, print.mode=c("brief","detailed","full"), digits=3, ...
 ##'
 ##' Summary Function for Class \code{gmdp}
 ##' @title Summary Function for Class gmdp
+##' @method summary gmdp
+##' @S3method summary gmdp
 ##' @param object an object of class \code{gmdp}.
 ##' @param ... arguments to be passed to methods, see \code{summary}.
 ##' @seealso \code{\link{gmdp}}
@@ -227,6 +229,8 @@ summary.gmdp <- function(object, ...){
 ##'
 ##' Plot Function for Class \code{gmdp}
 ##' @title Plot function for class gmdp
+##' @method plot gmdp
+##' @S3method plot gmdp
 ##' @param x an object of class \code{gmdp}.
 ##' @param labels a string vector of the same length of \code{x$labels},
 ##' giving the names of the numeric vectors in \code{x}.
@@ -252,7 +256,7 @@ summary.gmdp <- function(object, ...){
 ##' ## measure pairwise distance
 ##' x <- gmdp(cage[["Pfkfb3 (T02R00AEC2D8)"]],cage[["Csf1 (T03R0672174D)"]])
 ##' print(x)                     # print a brief version by default
-##' print(x, print.mode="full")  # print a full version by default
+##' print(x, mode="full")  # print a full version by default
 ##' 
 ##' ## show alignment
 ##' plot(x,labels=c("Pfkfb3","Csf1"),beside=FALSE)

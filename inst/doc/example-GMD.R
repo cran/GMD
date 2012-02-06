@@ -46,8 +46,8 @@ plot(mhist.obj,beside=FALSE,mar=c(1.5,1,1,0),
 ## ------------------------------------------------------------------------
 gmdp.obj <- gmdp(v1,v2)
 print(gmdp.obj)                       # print a brief version by default
-print(gmdp.obj,print.mode="detailed") # print a detailed version
-print(gmdp.obj,print.mode="full")     # print a full version
+print(gmdp.obj,mode="detailed") # print a detailed version
+print(gmdp.obj,mode="full")     # print a full version
 
 
 ## ------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 ##'
 ##' Computing Generalized Minimum Distance Matrix
 ##' @name gmdm
-##' @aliases gmdm print.gmdm gmdm2dist gmdm_dist
+##' @aliases gmdm gmdm2dist gmdm_dist \S3method{print}{gmdm}
 ##' @title Generalized Minimum Distance Matrix
 ##' @usage
 ##'
@@ -181,6 +181,10 @@ gmdm_dist <-
 ##'
 ##' S3 method for class \code{gmdm}
 ##' @title S3 method for class `gmdm'
+##' 
+##' @method plot gmdm
+##' @S3method plot gmdm
+##' 
 ##' @param x an object of class \code{gmdm}.
 ##' @param labels a string vector of the same length as \code{x$data},
 ##' giving the names of the numeric vectors in \code{x$data}.
@@ -209,7 +213,7 @@ gmdm_dist <-
 ##' data(cage)     # load data
 ##' 
 ##' ## construct a distance matrix and visualize it
-##' short.labels <- gsub("(.+) \\\\(.+","\\\\1",names(cage)) # get short labels
+##' short.labels <- gsub("(.+) \\(.+","\\1",names(cage)) # get short labels
 ##' x <- gmdm(cage[1:6],labels=short.labels[1:6])
 ##' plot(x)
 ##'

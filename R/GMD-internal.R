@@ -171,13 +171,15 @@
 ##' @param high numeric, higher bound of target values
 ##' @return an object with the same dimention of `x'.
 .scale.x <-
-  function(x,low=0,high=1)
+  function(x,low=0,high=1,na.rm=TRUE)
 {
-  if(max(x)==min(x)) NA
+  if(identical(max(x,na.rm=na.rm),min(x,na.rm=na.rm))) NA
   a <- 1/(max(x)-min(x))
   b <- -min(x)/(max(x)-min(x))
   a*x+b
 }
+
+
 
 ##' Scale values to make them follow Standard Normal Distribution
 ##'
@@ -278,7 +280,7 @@
 ##' @param target.x2 the upper bound of the target vector; the default is \code{1}.
 ##' @param na.rm a logical indicating whether missing values should be removed; \code{TRUE} by default.
 ##' @return a vector 
-##' @ examples
+##' @examples
 ##' v <- 1:10
 ##' normalizeVector(v,NULL,NULL,0,0.9)
 ##' normalizeVector(v,2,6,10,20)

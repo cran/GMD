@@ -1,66 +1,138 @@
 \name{plot.mhist}
 \alias{plot.mhist}
 \title{S3 method for class `plot.mhist'.}
-\usage{plot.mhist(x, beside=TRUE, labels, colors, main, sub, ylab, xlab,
-    xticks, x.las=1, xticks.type=c("pretty", "original"), xlim, ylim,
-    font.type=1, font.family=c("sans", "serif", "mono"), cex.main=1.75,
-    cex.sub=cex.main * 0.9, cex.lab=1.25, cex.tickmark=0.75,
-    cex.legend=1.5, tcl=-0.25, omi=c(0.5, 0.5, 1, 0.25), mar=c(4, 1, 0,
-    1), mgp=c(0, 0.5, 0), bin.unit=0.8, legend.lab=labels,
-    legend.pos=c("topright", "top", "topleft"), ...)}
-\description{S3 method for class \code{mhist}}
-\details{Given a list, matrix or data.frame of histograms, plot multiple histograms side-by-side or as subplots.}
-\references{See \code{help(GMD)}}
-\seealso{\code{\link{mhist}} \code{\link{mhist.summary}} \code{\link{plot.mhist.summary}} \code{\link{plot.gmdp}} \code{\link{plot.gmdm}}}
-\keyword{methods}
-\keyword{hplot}
-\arguments{\item{x}{a numeric matrix or data frame, representing distributions by rows (bins by columns); or a list of numeric vectors as distributions.}
-\item{beside}{logical, whether plot histograms side-by-side.}
-\item{labels}{a string vector of labels for the histograms in \code{x};
-should have the same number as of the histograms.}
-\item{colors}{the colors for the histograms; by default they are set to colors generated from palette Dark2.
-Colors will be recycled if the size is smaller than the number of the histograms.}
-\item{main}{an overall title for the plot. See \code{help("title", package="graphics")}.}
-\item{sub}{a subtitle for the plot, describing the distance and/or alignment gap (the "shift").}
-\item{ylab}{a title for the y axis. See \code{help("title", package="graphics")}.}
-\item{xlab}{a title for the x axis. See \code{help("title", package="graphics")}.}
-\item{xticks}{a string vector indicating the tickmark labels at x-axis. Defult: NULL.}
-\item{x.las}{numeric in {0,1,2,3}; the style of axis labels.
-See option \code{las} in\code{help("par", package="graphics")}.}
-\item{xticks.type}{stinrg in {"pretty","original"}, whether plot the \code{xticks} in a pretty way or as is.}
-\item{xlim}{range of x values, as in \code{help("plot", package="graphics")}.}
-\item{ylim}{range of y values, as in \code{help("plot", package="graphics")}.}
-\item{font.type}{the name of a font type for drawing text. See \code{font} in \code{par}.
-DEFAULT: \code{font.type = 1}, corresponding to plain text.}
-\item{font.family}{the name of a font family for drawing text. See \code{family} in \code{par};
-DEFAULT: \code{font.family = "sans"}, corresponding to san serif typeface.}
-\item{cex.main}{a numerical value giving the amount by which \code{main}-title should be
-magnified relative to the default.}
-\item{cex.sub}{a numerical value giving the amount by which \code{sub}-title should be
-magnified relative to the default.}
-\item{cex.lab}{a numerical value giving the amount by which \code{xlab} and \code{ylab} should be
-magnified relative to the default.}
-\item{cex.tickmark}{a numerical value giving the amount by which tickmarks should be
-magnified relative to the default.}
-\item{cex.legend}{a numerical value giving the amount by which legends should be
-magnified relative to the default.}
-\item{tcl}{the length of tick marks as a fraction of the height of a line of text.
-See option \code{tcl} in\code{help("par", package="graphics")}.}
-\item{omi}{a vector of the form 'c(bottom, left, top, right)' giving the size of the outer margins in inches.
-See option \code{omi} in\code{help("par", package="graphics")}.}
-\item{mar}{a numerical vector of the form \code{c(bottom, left, top, right)} which gives the number of lines
-of margin to be specified on the four sides of the plot.
-See option \code{mar} in\code{help("par", package="graphics")}.}
-\item{mgp}{the margin line (in 'mex' units) for the axis title, axis labels and axis line.
-See option \code{mgp} in\code{help("par", package="graphics")}.}
-\item{bin.unit}{numeric, indicating the width of a group of bar(s) in unit of x axis.}
-\item{legend.lab}{legend labels, a string vector of the same length of distributions in \code{x},
-using \code{labels} by default. No legend is displayed when it is \code{NA}.}
-\item{legend.pos}{string, a keyword to be used to position the legend.
-See \code{help("legend", package="graphics")}.}
-\item{...}{arguments to be passed to method \code{plot.mhist},
-such as graphical parameters (see \code{par}).}}
-\examples{## load library
+\usage{
+  \method{plot}{mhist} (x, beside = TRUE, labels = NULL,
+    colors = NULL, main = NULL, sub = NULL, ylab = NULL,
+    xlab = NULL, xticks = NULL, x.las = 1,
+    xticks.type = c("pretty", "original"), xlim = NULL,
+    ylim = NULL, font.type = 1,
+    font.family = c("sans", "serif", "mono"),
+    cex.main = 1.75, cex.sub = cex.main * 0.9,
+    cex.lab = 1.25, cex.tickmark = 0.75, cex.legend = 1.5,
+    tcl = -0.25, omi = c(0.5, 0.5, 1, 0.25),
+    mar = c(4, 1, 0, 1), mgp = c(0, 0.5, 0),
+    bin.unit = 0.8, legend.lab = labels,
+    legend.pos = c("topright", "top", "topleft"), ...)
+}
+\arguments{
+  \item{x}{a numeric matrix or data frame, representing
+  distributions by rows (bins by columns); or a list of
+  numeric vectors as distributions.}
+
+  \item{beside}{logical, whether plot histograms
+  side-by-side.}
+
+  \item{labels}{a string vector of labels for the
+  histograms in \code{x}; should have the same number as of
+  the histograms.}
+
+  \item{colors}{the colors for the histograms; by default
+  they are set to colors generated from palette Dark2.
+  Colors will be recycled if the size is smaller than the
+  number of the histograms.}
+
+  \item{main}{an overall title for the plot. See
+  \code{help("title", package="graphics")}.}
+
+  \item{sub}{a subtitle for the plot, describing the
+  distance and/or alignment gap (the "shift").}
+
+  \item{ylab}{a title for the y axis. See
+  \code{help("title", package="graphics")}.}
+
+  \item{xlab}{a title for the x axis. See
+  \code{help("title", package="graphics")}.}
+
+  \item{xticks}{a string vector indicating the tickmark
+  labels at x-axis. Defult: NULL.}
+
+  \item{x.las}{numeric in {0,1,2,3}; the style of axis
+  labels. See option \code{las} in\code{help("par",
+  package="graphics")}.}
+
+  \item{xticks.type}{stinrg in {"pretty","original"},
+  whether plot the \code{xticks} in a pretty way or as is.}
+
+  \item{xlim}{range of x values, as in \code{help("plot",
+  package="graphics")}.}
+
+  \item{ylim}{range of y values, as in \code{help("plot",
+  package="graphics")}.}
+
+  \item{font.type}{the name of a font type for drawing
+  text. See \code{font} in \code{par}. DEFAULT:
+  \code{font.type = 1}, corresponding to plain text.}
+
+  \item{font.family}{the name of a font family for drawing
+  text. See \code{family} in \code{par}; DEFAULT:
+  \code{font.family = "sans"}, corresponding to san serif
+  typeface.}
+
+  \item{cex.main}{a numerical value giving the amount by
+  which \code{main}-title should be magnified relative to
+  the default.}
+
+  \item{cex.sub}{a numerical value giving the amount by
+  which \code{sub}-title should be magnified relative to
+  the default.}
+
+  \item{cex.lab}{a numerical value giving the amount by
+  which \code{xlab} and \code{ylab} should be magnified
+  relative to the default.}
+
+  \item{cex.tickmark}{a numerical value giving the amount
+  by which tickmarks should be magnified relative to the
+  default.}
+
+  \item{cex.legend}{a numerical value giving the amount by
+  which legends should be magnified relative to the
+  default.}
+
+  \item{tcl}{the length of tick marks as a fraction of the
+  height of a line of text. See option \code{tcl}
+  in\code{help("par", package="graphics")}.}
+
+  \item{omi}{a vector of the form 'c(bottom, left, top,
+  right)' giving the size of the outer margins in inches.
+  See option \code{omi} in\code{help("par",
+  package="graphics")}.}
+
+  \item{mar}{a numerical vector of the form \code{c(bottom,
+  left, top, right)} which gives the number of lines of
+  margin to be specified on the four sides of the plot. See
+  option \code{mar} in\code{help("par",
+  package="graphics")}.}
+
+  \item{mgp}{the margin line (in 'mex' units) for the axis
+  title, axis labels and axis line. See option \code{mgp}
+  in\code{help("par", package="graphics")}.}
+
+  \item{bin.unit}{numeric, indicating the width of a group
+  of bar(s) in unit of x axis.}
+
+  \item{legend.lab}{legend labels, a string vector of the
+  same length of distributions in \code{x}, using
+  \code{labels} by default. No legend is displayed when it
+  is \code{NA}.}
+
+  \item{legend.pos}{string, a keyword to be used to
+  position the legend. See \code{help("legend",
+  package="graphics")}.}
+
+  \item{...}{arguments to be passed to method
+  \code{plot.mhist}, such as graphical parameters (see
+  \code{par}).}
+}
+\description{
+  S3 method for class \code{mhist}
+}
+\details{
+  Given a list, matrix or data.frame of histograms, plot
+  multiple histograms side-by-side or as subplots.
+}
+\examples{
+## load library
 require("GMD")
 
 ## create two normally-distributed samples
@@ -73,8 +145,8 @@ v2 <- rnorm(1000,mean=10, sd=5)
 n <- 20 # desired number of bins
 breaks <- gbreaks(c(v1,v2),n) # bin boundaries
 x <-
-list(ghist(v1,breaks=breaks,digits=0),
-ghist(v2,breaks=breaks,digits=0))
+  list(ghist(v1,breaks=breaks,digits=0),
+       ghist(v2,breaks=breaks,digits=0))
 mhist.obj <- as.mhist(x)
 
 ## plot histograms side-by-side
@@ -84,4 +156,16 @@ main="Histograms of simulated normal distributions")
 ## plot histograms as subplots,
 ## with corresponding bins aligned
 plot(mhist.obj,beside=FALSE,mar=c(1.5,1,1,0),
-main="Histograms of simulated normal distributions")}
+     main="Histograms of simulated normal distributions")
+}
+\references{
+  See \code{help(GMD)}
+}
+\seealso{
+  \code{\link{mhist}} \code{\link{mhist.summary}}
+  \code{\link{plot.mhist.summary}} \code{\link{plot.gmdp}}
+  \code{\link{plot.gmdm}}
+}
+\keyword{hplot}
+\keyword{methods}
+

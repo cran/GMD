@@ -1,0 +1,38 @@
+Changes in Version 0.3.1
+--- --- --- --- --- --- --- --- --- --- --- --- 
+    o added .Rinstignore.
+
+    o added the version information in the vignette.
+
+    o added `NEWS'
+
+    o added `NAMESPACE' and used appropriate S3 method descriptions in the documentation.
+
+    o fixed the `x' component returned by `heatmap.3'
+      (## transposed back to represent the original structure.)
+
+    o fixed the `NULL' arguments of functions in the documentation.
+      (## not captured by old `roxygen'.)
+
+    o changed the escape characters (doubled backslash) in the documentation.
+      (## due to changes in new `roxygen'.)
+
+    o fixed the `elbow.obj' to NULL in the S3 `plot' for `elbow' in the documentation.
+      (## was missing.)
+
+
+Changes in Version 0.3
+--- --- --- --- --- --- --- --- --- --- --- --- 
+    o added `css' module
+
+    o added `gdist' module
+
+    o added `ghist' module
+
+    o added `heatmap3' module
+
+    o added `chipseq_hCD4T' data
+
+    o added `chipseq_mES' data
+
+

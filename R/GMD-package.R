@@ -56,6 +56,7 @@
 ##' Maintainer: Xiaobei Zhao \email{xiaobei (at) binf.ku.dk}
 ##' @concept GMD gmd distance nonparametric optimize cluster classif
 ##' @keywords package
+##' @return \code{NULL}
 ##' @seealso \code{\link{gmdp}}, \code{\link{gmdm}}, \code{\link{cage}}, \code{\link{chipseq}}, \code{\link{ghist}}, \code{\link{gdist}}, \code{\link{css}}, \code{\link{elbow}}, \code{\link{heatmap.3}}
 ##' @examples
 ##' require(GMD)        # load GMD
@@ -66,6 +67,10 @@
 ##' citation("GMD")     # citation for publications
 ##' demo("GMD-demo")    # run the demo
 ##'
+##' ## view GMD Description
+##' packageDescription("GMD")
+##' 
 ##' ## view GMD vignette
 ##' vignette("GMD-vignette",package="GMD")
+##' 
 NULL
