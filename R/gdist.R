@@ -1,14 +1,14 @@
 
 
-## ##' .. content for \description{} (no empty lines) ..
-## ##'
-## ##' .. content for \details{} ..
-## ##' @title scale.and.crossprod
-## ##' @param x 
-## ##' @examples
-## ##' x <- matrix(sample(1:12),3)
-## ##' scale.and.crossprod(x)
-## ##' cor(x)
+## ## .. content for \description{} (no empty lines) ..
+## ##
+## ## .. content for \details{} ..
+## ## @title scale.and.crossprod
+## ## @param x 
+## ## @examples
+## ## x <- matrix(sample(1:12),3)
+## ## scale.and.crossprod(x)
+## ## cor(x)
 ## scale.and.crossprod <-
 ##   function(x)
 ## {
@@ -61,6 +61,7 @@ is.dist <-
 ##' @param d an R object.
 ##' @return
 ##' \code{gdist} returns an object of `dist'.\cr
+##' \code{is.dist} returns a logical value whether an object is `dist'.\cr
 ##' @examples
 ##' ## load library
 ##' require("GMD")
@@ -102,11 +103,11 @@ gdist <-
   if(method %in% c("correlation","correlation.of.observations")){
     FUN <- function(x,...){
       as.dist(1-cor(t(x),y=NULL,...),diag=diag,upper=upper)}
-    if (invalid(MoreArgs)) MoreArgs=list(method="pearson",use="everything")
+    if (.invalid(MoreArgs)) MoreArgs=list(method="pearson",use="everything")
   } else if(method %in% c("correlation.of.variables")){
     FUN <- function(x,...){
       as.dist(1-cor(x,y=NULL,...),diag=diag,upper=upper)}
-    if (invalid(MoreArgs)) MoreArgs=list(method="pearson",use="everything")
+    if (.invalid(MoreArgs)) MoreArgs=list(method="pearson",use="everything")
   }
 
   COMMON_METHODS <-

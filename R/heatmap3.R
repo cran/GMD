@@ -3,7 +3,8 @@
 ## FILENAME: heatmap3.R
 ## 
 ## AUTHOR: Xiaobei ZHAO <xiaobei _at_ binf.ku.dk>
-## 
+##
+## v0.3.3 2014-08-25 17:59:25 EDT
 ## v0.3.1 Sat Feb 04 16:13:09 CET 2012
 ## v0.3   Fri Nov 18 02:30:01 CET 2011
 ##
@@ -98,6 +99,12 @@
 ##' @param linecol the color of \code{hline} and \code{vline}. Defaults to the value of 'tracecol'.
 ##' @param labRow character vectors with row labels to use; defaults to \code{rownames(x)}.
 ##' @param labCol character vectors with column labels to use; defaults to \code{colnames(x)}.
+##' @param srtRow numerical, specifying (in degrees) how row labels should be rotated.
+##' See \code{help("par", package="graphics")}.
+##' @param srtCol numerical, specifying (in degrees) how col labels should be rotated.
+##' See \code{help("par", package="graphics")}.
+##' @param sideRow 2 or 4, which side row labels display.
+##' @param sideCol 1 or 3, which side row labels display.
 ##' @param margin.for.labRow a numerical value gives the margin to plot \code{labRow}.
 ##' @param margin.for.labCol a numerical value gives the margin to plot \code{labCol}.
 ##' @param ColIndividualColors (optional) character vector of length \code{ncol(x)} containing
@@ -111,6 +118,9 @@
 ##' @param labRow.by.group logical, whether group unique labels for rows.
 ##' @param labCol.by.group logical, whether group unique labels for columns.
 ##' @param key logical indicating whether a color-key should be shown.
+##' @param key.title character, title of the color-key ["Color Key"]
+##' @param key.xlab character, xlab of the color-key ["Value"]
+##' @param key.ylab character, ylab of the color-key ["Count"]
 ##' @param keysize numeric value indicating the relative size of the key
 ##' @param mapsize numeric value indicating the relative size of the heatmap.
 ##' @param mapratio the width-to-height ratio of the heatmap.
@@ -189,6 +199,7 @@
 ##' 
 ##' dev.new(width=10,height=8)
 ##' heatmap.3(x)                               # default, with reordering and dendrogram
+##' \dontrun{
 ##' heatmap.3(x, Rowv=FALSE, Colv=FALSE)       # no reordering and no dendrogram
 ##' heatmap.3(x, dendrogram="none")            # reordering without dendrogram
 ##' heatmap.3(x, dendrogram="row")        # row dendrogram with row (and col) reordering
@@ -200,6 +211,7 @@
 ##' names(heatmapOut)                          # view the list that is returned
 ##' heatmap.3(x, scale="column", x.center=0)   # colors centered around 0
 ##' heatmap.3(x, scale="column",trace="column")  # trun "trace" on
+##' }
 ##' 
 ##' ## coloring cars (row observations) by brand
 ##' brands <- sapply(rownames(x), function(e) strsplit(e," ")[[1]][1]) 
@@ -235,17 +247,20 @@
 ##' main <- "Heatmap of Ruspini data"
 ##' dev.new(width=10,height=10)
 ##' heatmap.3(x, main=main, mapratio=1) # with a title and a map in square!
+##' \dontrun{
 ##' heatmap.3(x, main=main, revC=TRUE)  # reverse column for a symmetric look
 ##' heatmap.3(x, main=main, kr=2, kc=2) # partition by predefined number of clusters
-##' 
+##' }
 ##' ## show partition by elbow
 ##' css.multi.obj <- css.hclust(x,hclust(x))
 ##' elbow.obj <- elbow.batch(css.multi.obj,ev.thres=0.90,inc.thres=0.05)
 ##' heatmap.3(x, main=main, revC=TRUE, kr=elbow.obj$k, kc=elbow.obj$k)
 ##'
+##' \dontrun{
 ##' ## show elbow info as subtitle
 ##' heatmap.3(x, main=main, sub=sub("\n"," ",attr(elbow.obj,"description")),
-##' cex.sub=1.25,revC=TRUE,kr=elbow.obj$k, kc=elbow.obj$k) 
+##' cex.sub=1.25,revC=TRUE,kr=elbow.obj$k, kc=elbow.obj$k)
+##' }
 heatmap.3 <-
   function(x,
            
@@ -291,8 +306,8 @@ heatmap.3 <-
            ## centering colors to a value
            x.center,
            ## colors
-           color.FUN="bluered", # from Package "gplots"
-
+           color.FUN=gplots::bluered,
+           ##
            ## block sepration
            sepList=list(NULL,NULL),
            sep.color=c("gray45","gray45"),
@@ -316,6 +331,11 @@ heatmap.3 <-
            ## Row/Column Labeling
            labRow=TRUE, ## shown by default
            labCol=TRUE, ## shown by default
+           srtRow=NULL,
+           srtCol=NULL,
+           sideRow=4,
+           sideCol=1,
+           ##
            margin.for.labRow,
            margin.for.labCol,
            ColIndividualColors,
@@ -328,6 +348,10 @@ heatmap.3 <-
 
            ## plot color key + density info
            key=TRUE,
+           key.title="Color Key",
+           key.xlab="Value",
+           key.ylab="Count",
+           
            keysize=1.5,
            mapsize=9,
            mapratio=4/3,
@@ -391,27 +415,42 @@ heatmap.3 <-
            ...
            )
 {
+  
 
-  ## store input
+  ## check input - take1 ##
+  if (is.data.frame(x)){
+    x <- as.matrix(x)
+  }
   x.ori <- x
+  
+  if(!inherits(x,"dist") & !is.matrix(x)){
+    stop("`x' should either be a matrix, a data.frame or a `dist' object.")
+  }
+
+  if (! sideRow %in% c(2,4)){
+    stop('sideRow must be either 2 or 4.')
+  }
+  
+  if (! sideCol %in% c(1,3)){
+    stop('sideCol must be either 1 or 3.')
+  }
+  
+  ## store input
   Rowv.ori <- Rowv
   Colv.ori <- Colv
   
-  ## check input - take1 ##
-  if(!inherits(x,"dist") & !is.matrix(x)){
-    stop("`x' should either be a matrix or a `dist' object.")
-  }
   
   ## check
-##   if ( !(dendrogram %in% c("both","row")) & !identical(Rowv,FALSE) ){
-##     warning("Discrepancy: No row dendrogram is asked;  Rowv is set to `FALSE'.")
-##     Rowv <- FALSE
-##   }
+  dendrogram <- match.arg(dendrogram)
+  if ( (dendrogram %in% c("both","row")) & !inherits(Rowv,"dendrogram") ){
+    warning("Discrepancy: row dendrogram is asked;  Rowv is set to `TRUE'.")
+    Rowv <- TRUE
+  }
 
-##   if ( !(dendrogram %in% c("both","col")) & !identical(Colv,FALSE) ){
-##     warning("Discrepancy: No col dendrogram is asked;  Colv is set to `FALSE'.")
-##     Colv <- FALSE
-##   }
+  if ( (dendrogram %in% c("both","col")) & !inherits(Colv,"dendrogram") ){
+    warning("Discrepancy: col dendrogram is asked;  Colv is set to `TRUE'.")
+    Colv <- TRUE
+  }
 
   
   if (identical(Rowv, FALSE) | missing(Rowv)){
@@ -426,7 +465,7 @@ heatmap.3 <-
     }
   }
 
-  if (identical(Colv, FALSE) | invalid(Colv)){
+  if (identical(Colv, FALSE) | .invalid(Colv)){
     if(!identical(cluster.by.col,FALSE)){
       warning("Discrepancy: No col dendrogram is asked; cluster.by.col is set to `FALSE'.")
       cluster.by.col <- FALSE
@@ -438,7 +477,7 @@ heatmap.3 <-
     }
   }
   
-  if (!invalid(kr)){
+  if (!.invalid(kr)){
     if (is.numeric(kr)){
       if(!plot.row.partition){
         warning("Discrepancy: kr is set, therefore plot.row.partition is set to `TRUE'.")
@@ -447,7 +486,7 @@ heatmap.3 <-
     }
   }
   
-  if (!invalid(kc)){
+  if (!.invalid(kc)){
     if (is.numeric(kc)){
       if(!plot.col.partition){
         warning("Discrepancy: kc is set, therefore plot.col.partition is set to `TRUE'.")
@@ -476,7 +515,7 @@ heatmap.3 <-
       dist.row <- dist.col <- as.dist(x)
     } else{
       if (cluster.by.row) {
-        if (invalid(dist.row)){
+        if (.invalid(dist.row)){
           dist.row <- .call.FUN(dist.FUN,x,MoreArgs=dist.FUN.MoreArgs)
         }
         mat.row <- as.matrix(dist.row)
@@ -485,7 +524,7 @@ heatmap.3 <-
         mat.row <- NULL
       }
       if (cluster.by.col) {
-        if (invalid(dist.col)){
+        if (.invalid(dist.col)){
           dist.col <- .call.FUN(dist.FUN,t(x),MoreArgs=dist.FUN.MoreArgs)
         }
         mat.col <- as.matrix(dist.col)
@@ -505,8 +544,7 @@ heatmap.3 <-
   }
 
   ## parse param ##
-  dendrogram <- match.arg(dendrogram)
-  scale <- if(symm && invalid(scale)) "none" else match.arg(scale) ## no scale on symmetric matrix
+  scale <- if(symm && .invalid(scale)) "none" else match.arg(scale) ## no scale on symmetric matrix
   trace <- match.arg(trace)
   density.info <- match.arg(density.info)
   dist.FUN <- match.fun(dist.FUN)
@@ -515,7 +553,7 @@ heatmap.3 <-
 
   
   ## NG if both breaks and scale are specified ##
-  if(!invalid(breaks) & (scale!="none")){
+  if(!.invalid(breaks) & (scale!="none")){
     warning("Using scale=\"row\" or scale=\"column\" when breaks are",
             "specified can produce unpredictable results.",
             "Please consider using only one or the other.")
@@ -535,11 +573,26 @@ heatmap.3 <-
     stop("`x' must have at least 2 rows and 2 columns")
 
   ## font size of row/col labels ##
-  if (invalid(cexRow)) cexRow=0.2+1/log10(nr)
-  if (invalid(cexCol)) cexCol=0.2+1/log10(nc)
+  cexRow0 <- 0.2+1/log10(nr)
+  cexCol0 <- 0.2+1/log10(nc)
 
+  
+  if (.invalid(cexRow)) {
+    cexRow <- cexRow0
+  } else {
+    message('heatmap.3 | From GMD 0.3.3, please use relative values for cexRow.')
+    cexRow <- cexRow0*cexRow
+  }
+  if (.invalid(cexCol)) {
+    cexCol <- cexCol0
+  } else {
+    message('heatmap.3 | From GMD 0.3.3, please use relative values for cexCol.')
+    cexCol <- cexCol0*cexCol
+  }
+
+  
   ## cellnote ##
-  ## ##if(invalid(cellnote)) cellnote <- matrix("",ncol=ncol(x),nrow=nrow(x))
+  ## ##if(.invalid(cellnote)) cellnote <- matrix("",ncol=ncol(x),nrow=nrow(x))
 
   ## ------------------------------------------------------------------------
   ## parse dendrogram ##
@@ -547,7 +600,7 @@ heatmap.3 <-
   
   if (missing(Rowv)) Rowv <- FALSE
   
-  if (invalid(Colv)) Colv <- if(symm) Rowv else FALSE
+  if (.invalid(Colv)) Colv <- if(symm) Rowv else FALSE
   if (Colv=="Rowv") {
     if ((!isTRUE(Rowv) | !symm) ){
       Colv <- FALSE
@@ -564,8 +617,8 @@ heatmap.3 <-
   cat("Preparing `hclust'... ")
   flush.console()
 
-  if ( (!inherits(Rowv,"dendrogram") & !identical(Rowv,FALSE)) | (cluster.by.row & invalid(row.clusters))){
-    if (invalid(hclust.row)){
+  if ( (!inherits(Rowv,"dendrogram") & !identical(Rowv,FALSE)) | (cluster.by.row & .invalid(row.clusters))){
+    if (.invalid(hclust.row)){
       hclust.row <- .call.FUN(hclust.FUN,dist.row,MoreArgs=hclust.FUN.MoreArgs)
     } else {
       if (length(hclust.row$order) != nr){
@@ -581,8 +634,8 @@ heatmap.3 <-
     hclust.col <- hclust.row
   }
 
-  if ( !inherits(Colv,"dendrogram") & !identical(Colv,FALSE) | (cluster.by.col & invalid(col.clusters))){
-    if (invalid(hclust.col)){
+  if ( !inherits(Colv,"dendrogram") & !identical(Colv,FALSE) | (cluster.by.col & .invalid(col.clusters))){
+    if (.invalid(hclust.col)){
       hclust.col <- .call.FUN(hclust.FUN,dist.col,MoreArgs=hclust.FUN.MoreArgs)
     } else {
       if (length(hclust.col$order) != nc){
@@ -665,6 +718,10 @@ heatmap.3 <-
   ## ------------------------------------------------------------------------
 
   
+  ## Xmisc::logme(dendrogram)
+  ## Xmisc::logme(Colv)
+  ## Xmisc::logme(Rowv)
+  
   ## dendrogram - check consistency: Rowv ##
   if ( is.null(ddr) & (dendrogram %in% c("both","row"))){
     warning("Discrepancy: Rowv is invalid or FALSE, while dendrogram is `",
@@ -718,12 +775,12 @@ heatmap.3 <-
   
   cat("2.dim(x):",dim(x),"\n")
   
-  if (!invalid(cellnote)) cellnote <- cellnote[rowInd,colInd]
+  if (!.invalid(cellnote)) cellnote <- cellnote[rowInd,colInd]
   
   ## reorder labels - row ##
   if(identical(labRow,TRUE)){ ## Note: x is already reorderred 
     labRow <- if (is.null(rownames(x))) (1:nr)[rowInd] else rownames(x)
-  } else if(identical(labRow,FALSE) | invalid(labRow)){
+  } else if(identical(labRow,FALSE) | .invalid(labRow)){
     labRow <- rep("",nrow(x))
   } else if(is.character(labRow)){
     labRow <- labRow[rowInd]
@@ -734,7 +791,7 @@ heatmap.3 <-
   ## reorder cellnote/labels - col ##
   if (identical(labCol,TRUE)){
     labCol <- if(is.null(colnames(x))) (1:nc)[colInd] else colnames(x)
-  } else if(identical(labCol,FALSE) | invalid(labCol)){
+  } else if(identical(labCol,FALSE) | .invalid(labCol)){
     labCol <- rep("",ncol(x))
   } else if(is.character(labCol)){
     labCol <- labCol[colInd]
@@ -755,15 +812,26 @@ heatmap.3 <-
   ## labels for observations/clusters/
   ## ------------------------------------------------------------------------
   ## margin for labels
-  if (invalid(margin.for.labRow)){
-    margin.for.labRow <- max(nchar(labRow))*0.75+0.2
+  
+  margin.for.labRow0 <- max(nchar(labRow))*0.75+0.2
+  margin.for.labCol0 <- max(nchar(labCol))*0.75+0.2
+  
+  if (.invalid(margin.for.labRow)){
+    margin.for.labRow <- margin.for.labRow0
+  } else {
+    message('heatmap.3 | From GMD 0.3.3, please use relative values for margin.for.labRow.')
+    margin.for.labRow <- margin.for.labRow0*margin.for.labRow
   }
-  if (invalid(margin.for.labCol)){
-    margin.for.labCol <- max(nchar(labCol))*0.75+0.2
+  
+  if (.invalid(margin.for.labCol)){
+    margin.for.labCol <- margin.for.labCol0
+  } else {
+    message('heatmap.3 | From GMD 0.3.3, please use relative values for margin.for.labCol.')
+    margin.for.labCol <- margin.for.labCol0*margin.for.labCol    
   }
   
   ## group unique labels - row ## ##??check
-  if (!invalid(labRow.by.group) & !identical(labRow.by.group,FALSE)){
+  if (!.invalid(labRow.by.group) & !identical(labRow.by.group,FALSE)){
     group.value <- unique(labRow)
     group.index <- sapply(group.value,function(x,y) min(which(y==x)),y=labRow)
     labRow <- rep("",length(labRow))
@@ -771,7 +839,7 @@ heatmap.3 <-
   }
   
   ## group unique labels - col ## ##??check
-  if (!invalid(labCol.by.group) & !identical(labCol.by.group,FALSE)){
+  if (!.invalid(labCol.by.group) & !identical(labCol.by.group,FALSE)){
     group.value <- unique(labCol)
     group.index <- sapply(group.value,function(x,y) min(which(y==x)),y=labCol)
     labCol <- rep("",length(labCol))
@@ -787,14 +855,14 @@ heatmap.3 <-
   flush.console()
   
   ## set breaks for binning x into colors ##
-  if(invalid(breaks)){
+  if(.invalid(breaks)){
     breaks <- 16
     ## print(sprintf("breaks=%s",breaks))
   }
 
   
   ## get x.range according to the value of x.center ##
-  if (!invalid(x.center)){ ## enhanced
+  if (!.invalid(x.center)){ ## enhanced
     if (is.numeric(x.center)){
       x.range.old <- range(x,na.rm=TRUE)
       dist.to.x.center <- max(abs(x.range.old-x.center))
@@ -843,7 +911,7 @@ heatmap.3 <-
   ## check if it is sufficient to draw side plots ##
   ## ------------------------------------------------------------------------
   if (cluster.by.row){
-    if (!invalid(row.clusters)) {## suppress kr
+    if (!.invalid(row.clusters)) {## suppress kr
       if(!is.numeric(row.clusters) | length(row.clusters)!=nr | !(.is.grouped(row.clusters))){
         warning("`row.clusters' is not a grouped numeric vector of length nrow(x); cluster.by.row is set to FALSE.")
         cluster.by.row <- FALSE
@@ -852,7 +920,7 @@ heatmap.3 <-
         kr <- length(unique(row.clusters))
       }
     } else {
-      if (invalid(kr)) kr <- 2
+      if (.invalid(kr)) kr <- 2
       if (is.numeric(kr) & length(kr)==1){
         row.clusters <- cutree(hclust.row,k=kr)
         row.clusters <- row.clusters[rowInd]
@@ -864,7 +932,7 @@ heatmap.3 <-
   }
 
   if (cluster.by.col){
-    if (!invalid(col.clusters)) {## suppress kc
+    if (!.invalid(col.clusters)) {## suppress kc
       if(!is.numeric(col.clusters) | length(col.clusters)!=nc | !(.is.grouped(col.clusters))){
         warning("`col.clusters' is not a grouped numeric vector of length ncol(x); cluster.by.col is set to FALSE.")
         cluster.by.col <- FALSE
@@ -877,7 +945,7 @@ heatmap.3 <-
 
       }
     } else {
-      if (invalid(kc)) kc <- 2
+      if (.invalid(kc)) kc <- 2
       if (is.numeric(kc) & length(kc)==1){
         col.clusters <- cutree(hclust.col,k=kc)
         col.clusters <- col.clusters[colInd]
@@ -894,7 +962,7 @@ heatmap.3 <-
 
 ##   print("revC")
 ##   print(revC)
-  if (!invalid(kr) & !invalid(kc)){
+  if (!.invalid(kr) & !.invalid(kc)){
     print(sprintf("kr=%s,kc=%s",kr,kc))
     flush.console()
   }
@@ -950,7 +1018,7 @@ heatmap.3 <-
       lhei <- c(0.02/mapratio,lhei)
     }
 
-    if(!invalid(RowIndividualColors)) { ## 4) add middle column to layout for vertical sidebar ##??check
+    if(!.invalid(RowIndividualColors)) { ## 4) add middle column to layout for vertical sidebar ##??check
       if(!is.character(RowIndividualColors) || length(RowIndividualColors) !=nr)
         stop("'RowIndividualColors' must be a character vector of length nrow(x)")
       lmat <- cbind(c(rep(NA,nrow(lmat)-sr),rep(max(lmat,na.rm=TRUE)+1,sr)),lmat)
@@ -960,7 +1028,7 @@ heatmap.3 <-
       lwid <- c(0.02,lwid) 
     }
     
-    if(!invalid(ColIndividualColors)) { ## 5) add middle row to layout for horizontal sidebar ##??check
+    if(!.invalid(ColIndividualColors)) { ## 5) add middle row to layout for horizontal sidebar ##??check
       if(!is.character(ColIndividualColors) || length(ColIndividualColors) !=nc){
         stop("'ColIndividualColors' must be a character vector of length ncol(x)")
       }
@@ -998,7 +1066,7 @@ heatmap.3 <-
     ## numbered 999 ##
     ## 9) for RowPlot (from bottom)
     ##print("plot.row.individuals")
-    if(invalid(text.box)){
+    if(.invalid(text.box)){
       text.box <- "made by\nFunction: heatmap.3\nPackage: GMD\nin R"
     }
     if(plot.row.individuals) { ## enhanced: add right column to layout for plots
@@ -1126,7 +1194,7 @@ heatmap.3 <-
       iy <- nr:1
       ddc <- rev(ddc)
       x <- x[iy,]
-      if (!invalid(cellnote)) cellnote <- cellnote[iy,]
+      if (!.invalid(cellnote)) cellnote <- cellnote[iy,]
     } else {
       iy <- 1:nr
     }
@@ -1136,7 +1204,7 @@ heatmap.3 <-
       ix <- nc:1
       ddr <- rev(ddr)
       x <- x[,ix]
-      if (!invalid(cellnote)) cellnote <- cellnote[,ix]
+      if (!.invalid(cellnote)) cellnote <- cellnote[,ix]
     } else {
       ix <- 1:nc
     }
@@ -1155,7 +1223,7 @@ heatmap.3 <-
     x.save <- x
     if(!symm || scale !="none"){ ##??
       x <- t(x)
-      if (!invalid(cellnote)) cellnote <- t(cellnote)
+      if (!.invalid(cellnote)) cellnote <- t(cellnote)
     }
 
     cat("5d.dim(x):",dim(x),"\n")
@@ -1170,21 +1238,46 @@ heatmap.3 <-
 
     
     ## plot/color NAs
-    if(!invalid(na.color) & any(is.na(x))){
+    if(!.invalid(na.color) & any(is.na(x))){
       mmat <- ifelse(is.na(x),1,NA)
       image(1:nc,1:nr,mmat,axes=FALSE,xlab="",ylab="",
             col=na.color,add=TRUE)
     }
 
+    ##
     ## labCol (?)
-    axis(1,1:nc,labels=labCol,las=2,line=-0.5,tick=0,cex.axis=cexCol,outer=outer)
-    if(!invalid(xlab)) mtext(xlab,side=1,line=margins[1]-1.25)
+    if ((dendrogram %in% c("both","col")) & sideCol==3) {
+      warning("Discrepancy: col dendrogram is asked; srtCol is set to 1.")
+      sideCol <- 1
+    }
+    if (!length(srtCol)) {
+      axis(sideCol,1:nc,labels=labCol,las=2,line=-0.5,tick=0,cex.axis=cexCol,outer=outer)
+    } else {
+      if (sideCol==1){
+        if (sideCol==1) .sideCol <- par("usr")[3]-0.5*srtCol/90 else .sideCol <- par("usr")[4]+0.5*srtCol/90
+        text(1:nc,.sideCol,labels=labCol,srt=srtCol,pos=1,xpd=TRUE,cex=cexCol)
+      }
+    }
+    
+    if(!.invalid(xlab)) mtext(xlab,side=1,line=margins[1]-1.25)
 
     ## labRow (?)
-    axis(4,iy,labels=labRow,las=2,line=-0.5,tick=0,cex.axis=cexRow,outer=outer)
-    if(!invalid(ylab)) mtext(ylab,side=4,line=margins[4]-1.25)
+    if ((dendrogram %in% c("both","row")) & sideRow==2) {
+      warning("Discrepancy: row dendrogram is asked; sideRow is set to 4.")
+      sideRow <- 4
+    }
+    if (!length(srtRow)) {
+      axis(sideRow,iy,labels=labRow,las=2,line=-0.5,tick=0,cex.axis=cexRow,outer=outer)
+    } else {
+      if (sideRow==4){
+        if (sideRow==4) .sideRow <- par("usr")[2]+0.5*srtRow/90 else .sideRow <- par("usr")[1]-0.5*srtRow/90
+        text(.sideRow,iy,labels=labRow,srt=srtRow,pos=1,xpd=TRUE,cex=cexRow)
+      }
+    }
+    
+    if(!.invalid(ylab)) mtext(ylab,side=4,line=margins[4]-1.25)
 
-    if (!invalid(add.expr))
+    if (!.invalid(add.expr))
       eval(substitute(add.expr))
     
     ## Enhanced: add 'sep.color' colored spaces to visually separate sections
@@ -1201,7 +1294,7 @@ heatmap.3 <-
 
 
     row.sepList <- sepList[[1]]
-    if (!invalid(row.sepList)){
+    if (!.invalid(row.sepList)){
       for (i in 1:length(row.sepList)){
         i.sep <- row.sepList[[i]]
         rect(
@@ -1218,7 +1311,7 @@ heatmap.3 <-
     }
 
     col.sepList <- sepList[[2]]
-    if (!invalid(col.sepList)){
+    if (!.invalid(col.sepList)){
       for (i in 1:length(col.sepList)){
         i.sep <- col.sepList[[i]]
         rect(
@@ -1243,12 +1336,12 @@ heatmap.3 <-
     x.scaled  <- .scale.x(t(x),min.scale,max.scale)
     cat("7.dim(x):",dim(x),"\n")
   
-    if(invalid(hline)) hline=median(breaks)
-    if(invalid(vline)) vline=median(breaks)
+    if(.invalid(hline)) hline=median(breaks)
+    if(.invalid(vline)) vline=median(breaks)
     
     if(trace %in% c("both","column")){
       for( i in colInd ){
-        if(!invalid(vline)){
+        if(!.invalid(vline)){
           vline.vals <- .scale.x(vline,min.scale,max.scale)
           abline(v=i-0.5+vline.vals,col=linecol,lty=2)
         }
@@ -1262,7 +1355,7 @@ heatmap.3 <-
 
     if(trace %in% c("both","row")){
       for( i in rowInd ){
-        if(!invalid(hline)){
+        if(!.invalid(hline)){
           hline.vals <- .scale.x(hline,min.scale,max.scale)
           abline(h=i+hline,col=linecol,lty=2)
         }
@@ -1274,7 +1367,7 @@ heatmap.3 <-
     }
 
     ## cellnote
-    if(!invalid(cellnote)){
+    if(!.invalid(cellnote)){
       text(x=c(row(cellnote)),
            y=c(col(cellnote)),
            labels=c(cellnote),
@@ -1296,7 +1389,7 @@ heatmap.3 <-
             col=par("bg"),
             axes=FALSE)
 
-      if (!invalid(plot.row.partitionList)){
+      if (!.invalid(plot.row.partitionList)){
         for (i in 1:length(plot.row.partitionList)){
           i.sep <- plot.row.partitionList[[i]]
           rect(
@@ -1332,7 +1425,7 @@ heatmap.3 <-
             col=par("bg"),
             axes=FALSE)
       
-      if (!invalid(plot.col.partitionList)){
+      if (!.invalid(plot.col.partitionList)){
         for (i in 1:length(plot.col.partitionList)){
           i.sep <- plot.col.partitionList[[i]]
           rect(
@@ -1359,14 +1452,14 @@ heatmap.3 <-
     
     
     ## 4) draw the side color bars - for row
-    if(!invalid(RowIndividualColors)) {    
+    if(!.invalid(RowIndividualColors)) {    
       par(mar=c(margins[1],0,0,0.5))
       ##cat(sprintf("side bars - for row:mar=c(%s)\n",paste(par("mai"),sep="",collapse=",")))
       image(rbind(1:nr),col=RowIndividualColors[rowInd],axes=FALSE)
     } 
     
     ## 5) draw the side color bars - for col
-    if(!invalid(ColIndividualColors)) {
+    if(!.invalid(ColIndividualColors)) {
       par(mar=c(0.5,0,0,margins[4]))
       ##cat(sprintf("side bars - for col:mar=c(%s)\n",paste(par("mai"),sep="",collapse=",")))
       image(cbind(1:nc),col=ColIndividualColors[colInd],axes=FALSE)
@@ -1378,7 +1471,11 @@ heatmap.3 <-
     if(dendrogram %in% c("both","row")){
       plot(ddr,horiz=TRUE,axes=FALSE,yaxs="i",leaflab="none")
     }else{
-      .plot.text()
+      .plot.text(ylim=range(iy))
+      if (sideRow==2){
+        .sideRow <- par("usr")[2]-0.5*srtCol/90
+        text(.sideRow,iy,labels=labRow,srt=srtRow,pos=1,xpd=TRUE,cex=cexRow)        
+      }
     }
 
     
@@ -1391,7 +1488,11 @@ heatmap.3 <-
     if(dendrogram %in% c("both","column")){
       plot(ddc,axes=FALSE,xaxs="i",leaflab="none")
     } else{
-      .plot.text()
+      .plot.text(xlim=range(1:nc))
+      if (sideCol==3){
+        .sideCol <- par("usr")[3]+0.5*srtCol/90
+        text(1:nc,.sideCol,labels=labCol,srt=srtCol,pos=1,xpd=TRUE,cex=cexCol)
+      }
     }
 
     
@@ -1419,7 +1520,7 @@ heatmap.3 <-
             breaks=breaks,
             xaxt="n",
             yaxt="n",
-            xlab="Value",
+            xlab=key.xlab,
             ylab="",
             main=""
             )
@@ -1438,7 +1539,7 @@ heatmap.3 <-
         lines(dens$x,dens$y / max(dens$y) * 0.95,col=denscol,lwd=1)
         axis(2,at=pretty(dens$y)/max(dens$y) * 0.95,pretty(dens$y),cex.axis=cex.key*1)
         ##title("Color Key and Density",cex.lab=cex.key*0.25)
-        title("Color Key",cex.main=cex.key,font.main=1)
+        title(key.title,cex.main=cex.key,font.main=1)
         mtext(side=2,"Density",line=0.75,cex=cex.key)
       } else if(density.info=="histogram"){
         h <- hist(x,plot=FALSE,breaks=breaks)
@@ -1447,10 +1548,10 @@ heatmap.3 <-
         lines(hx,hy/max(hy)*0.95,lwd=1,type="s",col=denscol)
         axis(2,at=pretty(hy)/max(hy)*0.95,pretty(hy),cex.axis=cex.key*1)
         ##title("Color Key and Histogram",cex.main=cex.key*0.25)
-        title("Color Key",cex.main=cex.key,font.main=1)
-        mtext(side=2,"Count",line=0.75,cex=cex.key)
+        title(key.title,cex.main=cex.key,font.main=1)
+        mtext(side=2,key.ylab,line=0.75,cex=cex.key)
       } else{
-        title("Color Key",cex.main=cex.key,font.main=1)
+        title(key.title,cex.main=cex.key,font.main=1)
       }
     } else{
       .plot.text()
@@ -1547,7 +1648,7 @@ heatmap.3 <-
     }
     
     ## 15) text
-    if (!invalid(text.box) & if.plot.info){
+    if (!.invalid(text.box) & if.plot.info){
       .plot.text(text.box,cex=cex.text,bg="gray75")
     } else{
       if (flag.text){

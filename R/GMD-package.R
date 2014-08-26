@@ -57,8 +57,10 @@
 ##' @concept GMD gmd distance nonparametric optimize cluster classif
 ##' @keywords package
 ##' @return \code{NULL}
-##' @seealso \code{\link{gmdp}}, \code{\link{gmdm}}, \code{\link{cage}}, \code{\link{chipseq}}, \code{\link{ghist}}, \code{\link{gdist}}, \code{\link{css}}, \code{\link{elbow}}, \code{\link{heatmap.3}}
+##' @seealso \code{\link{gmdp}}, \code{\link{gmdm}}, \code{\link{cage}}, \code{\link{chipseq}}, \code{\link{ghist}},
+##' \code{\link{gdist}}, \code{\link{css}}, \code{\link{elbow}}, \code{\link{heatmap.3}}
 ##' @examples
+##' \dontrun{
 ##' require(GMD)        # load GMD
 ##' help(GMD)           # a help document of GMD 
 ##' data(package="GMD") # a list of datasets available in GMD
@@ -72,5 +74,5 @@
 ##' 
 ##' ## view GMD vignette
 ##' vignette("GMD-vignette",package="GMD")
-##' 
+##' }
 NULL

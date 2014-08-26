@@ -1,12 +1,36 @@
-Changes in Version 0.3.1.1
+
+GMD Version 0.3.3 2014-08-24 12:41:41 EDT
+--- --- --- --- --- --- --- --- --- --- --- --- 
+    o updated `.plot.text'
+
+    o Added/updated options (cexCol,cexRow,srtCol,srtRow,sideRow,sideCol,key.title,key.xlab,key.ylab) to heatmap.3
+      (Thanks to Istvan (Steve) Ladunga for suggestion.)
+
+    o Added a tutorial `GMD-data-processing.pdf' for data processing, using ChIP-seq data as example.
+      (Thanks to Ryan Stueve for suggestion.)
+
+
+GMD Version 0.3.2 2014-07-24 15:57:35 EDT
+--- --- --- --- --- --- --- --- --- --- --- --- 
+    o Updated to recent R versions; Removed the deprecated `S3Method'
+
+    o Moved `inst/doc' to 'vignettes'.
+
+
+GMD Version 0.3.1.2 2012-03-27
+--- --- --- --- --- --- --- --- --- --- --- --- 
+    o Allow customized ticks and labels at X-axis in S3 method for class `mhist'.
+
+
+GMD Version 0.3.1.1 2012-02-06
 --- --- --- --- --- --- --- --- --- --- --- --- 
     o Fixed an option to produce the vignette. 
       (## removed `just=center' in one of the Sweave's code chunks)
 
 
-Changes in Version 0.3.1
+GMD Version 0.3.1 2012-02-06
 --- --- --- --- --- --- --- --- --- --- --- --- 
-    o added .Rinstignore.
+    o added `.Rinstignore'.
 
     o added the version information in the vignette.
 
@@ -20,14 +44,14 @@ Changes in Version 0.3.1
     o fixed the `NULL' arguments of functions in the documentation.
       (## not captured by old `roxygen'.)
 
-    o changed the escape characters (doubled backslash) in the documentation.
-      (## due to changes in new `roxygen'.)
+    o updated the escape characters (doubled backslash) in the documentation.
+      (## due to switching to `roxygen2' instead of `roxygen', when making documentation.)
 
     o fixed the `elbow.obj' to NULL in the S3 `plot' for `elbow' in the documentation.
       (## was missing.)
 
 
-Changes in Version 0.3
+GMD Version 0.3 2011-11-25
 --- --- --- --- --- --- --- --- --- --- --- --- 
     o added `css' module
 

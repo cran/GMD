@@ -2,14 +2,14 @@
 ##'
 ##' Computing Generalized Minimum Distance Matrix
 ##' @name gmdm
-##' @aliases gmdm gmdm2dist gmdm_dist \S3method{print}{gmdm}
+##' @aliases gmdm gmdm2dist gmdm_dist print.gmdm
 ##' @title Generalized Minimum Distance Matrix
 ##' @usage
 ##'
 ##' gmdm(data,labels,pseudocount=0,sliding=TRUE,resolution=1)
 ##' 
 ##' ## S3 method for class `gmdm'
-##' print.gmdm(x, ...)
+##' \method{print}{gmdm}(x, ...)
 ##'
 ##' ## convert a `gmdm' object into a `dist' object
 ##' gmdm2dist(m, diag=FALSE, upper=FALSE)
@@ -80,7 +80,7 @@ gmdm <-
   }
 
   ## labels ##
-  if (invalid(labels)){
+  if (.invalid(labels)){
     labels <- NULL
   }
 
@@ -141,6 +141,7 @@ the first one will be saved.",labels[i],labels[j]))
   return(ret)
 }
 
+
 print.gmdm <-
   function(x, ...)
 {
@@ -182,14 +183,14 @@ gmdm_dist <-
 ##' S3 method for class \code{gmdm}
 ##' @title S3 method for class `gmdm'
 ##' 
-##' @method plot gmdm
-##' @S3method plot gmdm
+##' @export plot.gmdm
 ##' 
 ##' @param x an object of class \code{gmdm}.
 ##' @param labels a string vector of the same length as \code{x$data},
 ##' giving the names of the numeric vectors in \code{x$data}.
 ##' @param colors the colors of the discrete distributions; the default is \emph{"Dark2" colors
 ##' in ColorBrewer palettes} if not specified.
+##' @param type type of plot, as in \code{help("plot", package="graphics")}.
 ##' @param main an overall title for the plot. See \code{help("title", package="graphics")};
 ##' the default title is used if not specified.
 ##' @param ylab a title for the y axis. See \code{help("title", package="graphics")}.
@@ -217,7 +218,7 @@ gmdm_dist <-
 ##' x <- gmdm(cage[1:6],labels=short.labels[1:6])
 ##' plot(x)
 ##'
-##' 
+##' \dontrun{
 ##' ## ------------------------------------------------------------------------
 ##' ## Example2: ChIP-seq
 ##' ## ------------------------------------------------------------------------
@@ -229,12 +230,14 @@ gmdm_dist <-
 ##' 
 ##' ## clustering on spatial distributions of histone modifications
 ##' x <- gmdm(chipseq_hCD4T,sliding=FALSE,resolution=10)
-##' heatmap.3(x,revC=TRUE) 
+##' heatmap.3(x,revC=TRUE)
+##' }
 plot.gmdm <- 
   function(x,
            ##
            labels,
            colors,
+           type=NULL,
            ##
            main,
            ylab="Fraction",
@@ -258,11 +261,11 @@ plot.gmdm <-
   x.meta <- attr(x,"meta")
   
   ## params ##
-  if(invalid(colors)){
+  if (.invalid(colors)){
     colors <- .brewer.pal.Dark2(8)
   }
 
-  if(invalid(labels)){
+  if (.invalid(labels)){
     labels <- x.meta$labels
   }
   
@@ -293,7 +296,7 @@ The first %s characters are kept.",label.size.max,label.size.max)
   }
 
   ## Main title ##
-  if(invalid(main)){
+  if (.invalid(main)){
     main <-
       sprintf("Optimal alignments among distributions (%s sliding)",
               ifelse(x.meta$sliding,"with","without")
@@ -382,7 +385,8 @@ The first %s characters are kept.",label.size.max,label.size.max)
                 xlab="",
                 ylab="",
                 ylim=c(0,ylim.max),
-                xlim=c(1,xlim.max),
+                xlim=c(1,xlim.max),                
+                type=type,
                 cex.tickmark=cex.tickmark,
                 tcl=-0.1,
                 ...

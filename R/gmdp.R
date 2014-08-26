@@ -152,18 +152,6 @@ Otherwise, please allow `sliding` (sliding=TRUE).\n"
 
 
 
-##' Print Function for Class \code{gmdp}
-##'
-##' Print Function for Class \code{gmdp}
-##' @title Print Function for class gmdp
-##' @method print gmdp
-##' @S3method print gmdp
-##' @param x an object of class \code{gmdp}.
-##' @param mode a string, indicating whether to print in \emph{full} mode (\emph{default}). 
-##' @param digits integer, indicating the number of decimal places to be printed.
-##' @param ... arguments to be passed to methods, see \code{print}.
-##' @seealso \code{\link{gmdp}}
-##' @references See \code{help(GMD)}
 print.gmdp <- function(x, mode=c("brief","detailed","full"), digits=3, ...)
 {
   if (!.is.gmdp(x)){
@@ -203,18 +191,7 @@ print.gmdp <- function(x, mode=c("brief","detailed","full"), digits=3, ...)
 }
 
 
-    
- 
-##' Summary Function for Class \code{gmdp}
-##'
-##' Summary Function for Class \code{gmdp}
-##' @title Summary Function for Class gmdp
-##' @method summary gmdp
-##' @S3method summary gmdp
-##' @param object an object of class \code{gmdp}.
-##' @param ... arguments to be passed to methods, see \code{summary}.
-##' @seealso \code{\link{gmdp}}
-##' @references See \code{help(GMD)}
+
 summary.gmdp <- function(object, ...){
   if (!.is.gmdp(object)){
     stop("`object' should be an object of class `gmdp'.")
@@ -229,8 +206,8 @@ summary.gmdp <- function(object, ...){
 ##'
 ##' Plot Function for Class \code{gmdp}
 ##' @title Plot function for class gmdp
-##' @method plot gmdp
-##' @S3method plot gmdp
+##' 
+##' @export plot.gmdp
 ##' @param x an object of class \code{gmdp}.
 ##' @param labels a string vector of the same length of \code{x$labels},
 ##' giving the names of the numeric vectors in \code{x}.
@@ -242,6 +219,7 @@ summary.gmdp <- function(object, ...){
 ##' @param xlab a title for the x axis.
 ##' See \code{help("plot.mhist", package="GMD")}.
 ##' @param xlim numeric vectors of length 2, giving the x coordinates ranges.
+##' @param type type of plot, as in \code{help("plot", package="graphics")}.
 ##' @param if.text.gmd logical, indicating whether \emph{GM-Distance} is reported in the subtitle.
 ##' @param if.text.gap logical, indicating whether \emph{gap} is reported in the subtitle.
 ##' @param ... arguments to be passed to methods.
@@ -276,6 +254,7 @@ plot.gmdp <-
            xlab="Position",
            ##
            xlim=NULL,
+           type=NULL,
            ##
            if.text.gmd=TRUE,
            if.text.gap=TRUE,
@@ -295,7 +274,7 @@ plot.gmdp <-
   x.meta <- attr(x,"meta")
 
   ## labels
-  if (invalid(labels)){
+  if (.invalid(labels)){
     labels <- x.meta$labels
   }
 
@@ -307,7 +286,7 @@ plot.gmdp <-
   s.gap <- sprintf("gap=%s",sprintf("c(%s,%s)",gap.pair[1],gap.pair[2]))
 
   ## title and subtitle ##
-  if(invalid(main)){
+  if (.invalid(main)){
     main <-
       sprintf("Optimal alignment between distributions (%s sliding)",
               ifelse(x.meta$sliding,"with","without")
@@ -343,7 +322,7 @@ plot.gmdp <-
   tmp.x <- list(tmp.v1,tmp.v2)
   names(tmp.x) <- labels
 
-  if (invalid(xlim)) {
+  if (.invalid(xlim)) {
     xlim <- c(1,max(unlist(lapply(tmp.x,length))))
   }
   
@@ -358,6 +337,7 @@ plot.gmdp <-
                ylab=ylab,
                xlab=xlab,
                xlim=xlim,
+               type=type,
                ...
                )
   

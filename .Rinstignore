@@ -1,3 +1,4 @@
-inst/doc/.*[.]sty$
-inst/doc/.*[.]bib$
-inst/doc/GMD-fig-.*[.]pdf$
+doc/.*[.](bib|bst|sty)$
+doc/.*[.](pdf)$
+doc/.*-fig-.*[.]pdf$
+doc/.*[.](R|sh)$

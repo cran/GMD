@@ -16,3 +16,24 @@ citEntry(entry="article",
           sep=" ")
 )
 
+
+citEntry(
+  entry="Manual",
+  title = "GMD: Generalized Minimum Distance of distributions",
+  author = personList(
+    as.person("Xiaobei Zhao and Albin Sandelin")
+    ),
+  year = "2014",
+  url = "http://CRAN.R-project.org/package=GMD",
+  note = "R package",
+  textVersion = 
+  paste(
+    "Zhao, Xiaobei and Sandelin, Albin",
+    "GMD: Generalized Minimum Distance of distributions",
+    "R package",
+    "2014",
+    "http://CRAN.R-project.org/package=GMD",
+    sep=". "
+  ),
+  header = "Also please use the following citation:"
+  )

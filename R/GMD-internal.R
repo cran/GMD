@@ -104,34 +104,6 @@
       )
 
 
-
-##' Turns a possibly relative file path absolute, performing tilde expansion if necessary.
-##'
-##' A copy of `tools:::file_path_as_absolute'.
-##' @title Turns a Possibly Relative File Path Absolute
-##' @return An absolute path
-.file_path_as_absolute <- 
-  function (x) 
-{
-  if (length(x) != 1L) 
-    stop("'x' must be a single character string")
-  if (!file.exists(epath <- path.expand(x))) 
-    stop(gettextf("file '%s' does not exist", x), domain = NA)
-  cwd <- getwd()
-  if (is.null(cwd)) 
-    stop("current working directory cannot be ascertained")
-  on.exit(setwd(cwd))
-  if (file_test("-d", epath)) {
-    setwd(epath)
-    getwd()
-  }
-  else {
-    setwd(dirname(epath))
-    file.path(sub("/$", "", getwd()), basename(epath))
-  }
-}
-
-
 .setTextContrastColor <- function(color){
   ifelse( mean(col2rgb(color)) > 127, "black", "white")
 }
@@ -217,7 +189,7 @@
 {
   FUN <- match.fun(FUN)
   tmp.MoreArgs <- list(...)
-  if (!invalid(MoreArgs)){
+  if (!.invalid(MoreArgs)){
     if (length(MoreArgs)>=1){
       for (i in 1:length(MoreArgs)) tmp.MoreArgs[[names(MoreArgs)[i]]] <- MoreArgs[[i]]
     }
@@ -251,8 +223,8 @@
 ##' @param bordercolor color of border
 ##' @param axes as in \code{graphics:::plot}
 ##' @param ... additional arguments for \code{graphics:::text}
-.plot.text <- function(x,cex=1,forecolor=par("fg"),bg=par("bg"),bordercolor=NA,axes=FALSE,...){
-  if (invalid(x)){
+.plot.text <- function(x,xlim=c(0,1),ylim=c(0,1),cex=1,forecolor=par("fg"),bg=par("bg"),bordercolor=NA,axes=FALSE,...){
+  if (.invalid(x)){
     x <- NULL
   }
   if (is.null(x)){
@@ -261,7 +233,7 @@
     x <- 'NA'
   }
   
-  plot(c(0,1),c(0,1),type="n",ylab="",xlab="",xaxt="n",yaxt="n",axes=axes)
+  plot(xlim,ylim,type="n",ylab="",xlab="",xaxt="n",yaxt="n",axes=axes)
   rect(xleft=0, ybottom=0, xright=1, ytop=1, col=bg, border=bordercolor)
   text(0.5,0.5,x,cex=cex,...)
 }
@@ -306,7 +278,7 @@
 ##   function(pkg,msg=NULL)
 ## {
 ##   if (is.na(packageDescription(pkg))) {
-##     if(!invalid(msg)){
+##     if (!.invalid(msg)){
 ##       cat(sprintf("%s\n"),msg)
 ##     }
 ##     flag <- readline(sprintf("Install \"%s\" now? [Y/n]",pkg))
@@ -322,58 +294,9 @@
 
 
 ## ------------------------------------------------------------------------
-## Borrowed from others
+## 
 ## ------------------------------------------------------------------------
 
-##' A copy of gtools:::invalid
-##' 
-##' see \code{invalid} in package:gtools for details
-##' @title Test if a value is missing, empty, or contains only NA or NULL values
-##' @param x value to be tested
-invalid <- 
-  function(x) 
-{
-  if (missing(x) || is.null(x) || length(x) == 0) 
-    return(TRUE)
-  if (is.list(x)) 
-    return(all(sapply(x, invalid)))
-  else if (is.vector(x)) 
-    return(all(is.na(x)))
-  else return(FALSE)
-}
-
-
-##' A copy of wq:::ts2df; see \code{ts2df} in package:wq for details
-##' 
-##' see \code{ts2df} in package:wq for details.
-##' Note: wq_0.3-4 asks for R (>= 2.12.0); but GMD supports R (>= 2.9.0).
-##' @title Convert time series to data frame
-##' @param x monthly time series vector
-##' @param mon1 starting month number, i.e., first column of the data frame
-##' @param addYr rows are normally labelled with the year of the starting
-##' month, but \code{addYr = TRUE} will add 1 to this year number
-##' @param omit if \code{TRUE}, then rows with any \code{NA} will be removed.
-ts2df <- 
-function(x, mon1 = 1, addYr = FALSE, omit = FALSE) 
-{
-    if (!is(x, "ts") || is(x, "mts") || !identical(frequency(x), 
-        12)) 
-        stop("x must be a monthly 'ts' vector")
-    if (!mon1 %in% 1:12) 
-        stop("mon1 must be between 1 and 12")
-    x1 <- window(x, start = c(start(x)[1] - 1, mon1), end = c(end(x)[1] + 
-        1, ifelse(mon1 == 1, 12, mon1 - 1)), extend = TRUE)
-    d1 <- as.data.frame(matrix(x1, byrow = TRUE, ncol = 12))
-    colnames(d1) <- if (mon1 == 1) 
-        month.abb
-    else month.abb[c(mon1:12, 1:(mon1 - 1))]
-    rownames(d1) <- (start(x1)[1] + addYr):(start(x1)[1] + nrow(d1) - 
-        1 + addYr)
-    d1 = d1[apply(d1, 1, function(x) !all(is.na(x))), ]
-    if (omit) 
-        d1 = na.omit(d1)
-    d1
-}
 
 
 ##' This function can be used to add legends to plots.  Note that a call

@@ -1,5 +1,26 @@
 useDynLib(GMD)
 
+
+##' ------------------------------------------------------------------------
+##' IMPORT
+##' ------------------------------------------------------------------------
+
+import(stats)
+import(grDevices)
+
+
+## import(gplots)
+importFrom(gplots,bluered)
+importFrom(gplots,barplot2)
+
+
+##' ------------------------------------------------------------------------
+##' EXPORT
+##' ------------------------------------------------------------------------
+
+# exportPattern("^[^\\.]")
+
+
 export(ghist)
 export(gbreaks)
 
@@ -26,14 +47,15 @@ export(gmdm_dist)
 
 export(heatmap.3)
 
+export(plot.mhist)
+export(plot.mhist.summary)
 
-S3method(plot,    mhist)
-S3method(plot,    mhist.summary)
+export(plot.elbow)
 
-S3method(plot,    elbow)
+export(print.gmdp)
+export(summary.gmdp)
+export(plot.gmdp)
+export(print.gmdm)
+export(plot.gmdm)
 
-S3method(print,   gmdp)
-S3method(summary, gmdp)
-S3method(plot,    gmdp)
-S3method(print,   gmdm)
-S3method(plot,    gmdm)
+export(bedgraph.to.depth)

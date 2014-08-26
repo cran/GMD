@@ -31,7 +31,7 @@ gbreaks <-
 ##' @aliases ghist gbreaks is.ghist as.ghist mhist is.mhist as.mhist mhist2matrix
 ##' @title Generalized Histogram Computation
 ##' @usage
-##' ghist(data,n,breaks=if (!invalid(n)) NULL else "Sturges",
+##' ghist(data,n,breaks=if (!.invalid(n)) NULL else "Sturges",
 ##' bins=NULL,digits=1)
 ##' 
 ##' gbreaks(data, n)
@@ -76,13 +76,14 @@ gbreaks <-
 ##'        ghist(v2,breaks=breaks,digits=0))
 ##' mhist.obj <- as.mhist(x)
 ghist <-
-  function(data,n,breaks=if (!invalid(n)) NULL else "Sturges",bins=NULL,digits=1)
+  function(data,n,breaks=if (!.invalid(n)) NULL else "Sturges",bins=NULL,digits=1)
 {
-  if (!invalid(n)) breaks <- gbreaks(data,n)
+  if (!.invalid(n)) breaks <- gbreaks(data,n)
+  
   res <- hist(data,breaks=breaks,plot=FALSE)
   ret <- res$counts
   breaks <- round(res$breaks,digits=digits)
-  if (invalid(bins)){
+  if (.invalid(bins)){
     ##attr(ret,"bins") <- paste("(",breaks[-length(breaks)],", ",breaks[-1],"]")
     attr(ret,"bins") <- breaks[-1]
   } else {
@@ -107,7 +108,7 @@ as.ghist <-
   if(!is.numeric(x)){
     stop("`x' should be a numeric vector.")
   }
-  if (invalid(bins)){
+  if (.invalid(bins)){
     bins <- 1:length(x)
   }
   attr(x,"bins") <- bins
@@ -139,18 +140,18 @@ as.mhist <-
   if(is.list(x) & !is.data.frame(x)){
     x <- equalize.list(x)
     if(all(unlist(lapply(x,is.ghist)))){
-      if (invalid(bins)) bins <- attr(x[[1]],"bins")
+      if (.invalid(bins)) bins <- attr(x[[1]],"bins")
       if (length(x)>1){
         if (!all(unlist(lapply(x,function(e) identical(bins,attr(e,"bins")))))){ # currently, bins should be in the same order.
           stop("To create a `mhist' (multi-histograms) object, each member histogram should has the same bins.")
         }
       }
     } else {
-      if (invalid(bins)) bins <- NULL
+      if (.invalid(bins)) bins <- NULL
       n <- length(x[[1]])
     }
   } else {
-    if (invalid(bins)) bins <- colnames(x)
+    if (.invalid(bins)) bins <- colnames(x)
     if(is.matrix(x)) {
       x <- data.frame(x)
     }
@@ -178,7 +179,7 @@ that memeber histograms have the same order of the bins.")
   }
   class(x) <- c("mhist",class(x))
   attr(x,"memebers") <- length(x)
-  if (!invalid(names(x))){
+  if (!.invalid(names(x))){
     attr(x,"labels") <- names(x)
   } else {
     attr(x,"labels") <- as.character(1:length(x))
@@ -226,10 +227,9 @@ equalize.list <-
 ##' S3 method for class \code{mhist}
 ##'
 ##' Given a list, matrix or data.frame of histograms, plot multiple histograms side-by-side or as subplots.
-##' @title S3 method for class `plot.mhist'.
+##' @title S3 method for class `mhist'.
 ##' 
-##' @method plot mhist
-##' @S3method plot mhist
+##' @export plot.mhist
 ##' 
 ##' @param x a numeric matrix or data frame, representing distributions by rows (bins by columns); or a list of numeric vectors as distributions. 
 ##' @param beside logical, whether plot histograms side-by-side.
@@ -242,11 +242,14 @@ equalize.list <-
 ##' @param ylab a title for the y axis. See \code{help("title", package="graphics")}.
 ##' @param xlab a title for the x axis. See \code{help("title", package="graphics")}.
 ##' @param xticks a string vector indicating the tickmark labels at x-axis. Defult: NULL.
+##' @param xlabels character, labels at x-axis.
+##' @param vlinePos numeric, posiitons for vertical lines.
 ##' @param x.las numeric in {0,1,2,3}; the style of axis labels.
 ##' See option \code{las} in\code{help("par", package="graphics")}.
 ##' @param xticks.type stinrg in {"pretty","original"}, whether plot the \code{xticks} in a pretty way or as is.
 ##' @param xlim range of x values, as in \code{help("plot", package="graphics")}.
 ##' @param ylim range of y values, as in \code{help("plot", package="graphics")}.
+##' @param type type of plot, as in \code{help("plot", package="graphics")}.
 ##' @param font.type the name of a font type for drawing text. See \code{font} in \code{par}.
 ##' DEFAULT: \code{font.type = 1}, corresponding to plain text.
 ##' @param font.family the name of a font family for drawing text. See \code{family} in \code{par};
@@ -319,10 +322,13 @@ plot.mhist <-
            ylab=NULL,
            xlab=NULL,
            xticks=NULL,
+           xlabels=NULL,
+           vlinePos=NULL,
            x.las=1,
            xticks.type=c("pretty","original"),
            xlim=NULL,
            ylim=NULL,
+           type=NULL, ##XB
            ## font and size
            font.type=1,
            font.family=c("sans","serif","mono"),           
@@ -343,7 +349,9 @@ plot.mhist <-
            legend.pos=c("topright","top","topleft"),
            ...
            )
-{  
+{
+  message(xlabels)
+  
   if (!is.mhist(x)){
     stop("`x' should be an object of class `mhist'.")
   }
@@ -368,7 +376,7 @@ plot.mhist <-
 
   ## par
   ## labels
-  if(invalid(labels)){
+  if (.invalid(labels)){
     labels <- colnames(x)
   }
   if (is.null(labels)){
@@ -377,7 +385,7 @@ plot.mhist <-
 
   
   ## colors
-  if(invalid(colors)){
+  if (.invalid(colors)){
     colors <- .brewer.pal.Dark2(8)
   }
   
@@ -387,35 +395,35 @@ plot.mhist <-
   }
 
   ## main and sub ##
-  if(invalid(main)){
+  if (.invalid(main)){
     if(length(x.ori) == 1)
       main <- "Histogram"
     else
       main <- "Multiple Histograms"
   }
   
-  if(invalid(sub)){
+  if (.invalid(sub)){
     sub <- ""
   }
 
   
   ## xlim ##
-  if (invalid(xlim))
+  if (.invalid(xlim))
     xlim <- c(1, M)
   xlim.extra <- c(xlim[1]-(1-half.bin.unit), xlim[2]+(1-half.bin.unit))
   
   ## ylim ##
-  if (invalid(ylim))
+  if (.invalid(ylim))
     ylim <- .scale.range(range(unlist(x), na.rm=TRUE),1.05)
   y.neg <- any(x<0, na.rm=TRUE)
 
   ##
-  if (invalid(xlab)){
+  if (.invalid(xlab)){
     xlab <- "Bin"
   }
 
   ##
-  if (invalid(ylab)){
+  if (.invalid(ylab)){
     ylab <- "Count"
   }
 
@@ -434,8 +442,15 @@ plot.mhist <-
       x.at <- x.at
       x.labels <- bins
     }
-  } else if (is.na(xticks)) {
+  } else if (identical(xticks,NA)) {
     x.at <- x.labels <- NULL
+  } else if (is.numeric(xticks)) {
+    x.at <- xticks
+    if (.invalid(xlabels)){
+      x.labels <- NULL
+    } else{
+      x.labels <- xlabels
+    }
   } 
 
   ##print(x.at)
@@ -464,6 +479,10 @@ plot.mhist <-
          ...
          )
 
+    if (!is.null(vlinePos)){
+      abline(v=vlinePos,lty="dotdash")
+    }
+    
     mtext(line=2,side=3,text=main,outer=FALSE,cex=cex.main,adj=0) # main title
     mtext(line=0.55,side=3,text=sub,outer=FALSE,cex=cex.sub,adj=0) # subtitle
 
@@ -473,22 +492,32 @@ plot.mhist <-
     
     if (!is.null(y.at))
       axis(2, at=y.at, cex.axis=cex.tickmark, las=1)
-    
+
     bottoms <- 0
     bottoms <- matrix(bottoms, nrow=M, ncol=N)
     barhalf.bin.unit <- 2*half.bin.unit/N
     border <- NA
 
     for (i in 1:N){
-      rect(xleft=(1:M)-half.bin.unit+(i-1)*barhalf.bin.unit,
-           ybottom=bottoms[,i],
-           xright=(1:M)-half.bin.unit+i*barhalf.bin.unit,
-           ytop=x[,i],
-           col=colors[i],
-           border=border) 
+      if(!length(type)){
+        rect(xleft=(1:M)-half.bin.unit+(i-1)*barhalf.bin.unit,
+             ybottom=bottoms[,i],
+             xright=(1:M)-half.bin.unit+i*barhalf.bin.unit,
+             ytop=x[,i],
+             col=colors[i],
+             border=border)
+      } else if (type %in% "polygon"){
+        .x <- (1:M)-half.bin.unit+(2*i-1)/2*barhalf.bin.unit
+        .y <- x[,i]
+        y.polygon <- c(.y, rep(0,length(.y)))
+        x.polygon <- c(.x, rev(.x))
+        graphics::polygon(x.polygon, y.polygon, col=colors[i], border=border)        
+      } else{
+        lines(.x,x[,i],col=colors[i],type=type)
+      }
     }
     
-    if (!all(invalid(legend.lab))) {
+    if (!all(.invalid(legend.lab))) {
       ##print("Plotting legends ..")
       xjust <- yjust <- 0.5
       legend(legend.pos,
@@ -524,6 +553,9 @@ plot.mhist <-
            ...
            )
       
+      if (!is.null(vlinePos)){
+        abline(v=vlinePos,lty="dotdash")
+      }
       ##print(x.at)
       if (!is.null(x.at))
         axis(side=1, at=x.at, labels=x.labels, cex.axis=cex.tickmark,las=x.las)
@@ -543,7 +575,7 @@ plot.mhist <-
            col=colors[j],
            border=border) 
 
-      if (!all(invalid(legend.lab))) {
+      if (!all(.invalid(legend.lab))) {
         ##print("Plotting legends ..")
         xjust <- yjust <- 0.5
         legend(legend.pos,
@@ -582,7 +614,7 @@ plot.mhist <-
 ##' Bin-wise summary of a \code{mhist} object of histograms
 ##'
 ##' Bin-wise summary of a \code{mhist} object of histograms
-##' @name mhist.summary
+##' @name mhist.summary 
 ##' @aliases mhist.summary plot.mhist.summary
 ##' 
 ##' @title Bin-wise summary of histograms
@@ -645,31 +677,6 @@ mhist.summary <-
 
 
 
-##' S3 method for class \code{mhist.summary}
-##'
-##' Plot bin-wise summaries of histograms
-##' @title S3 method for class `mhist.summary'
-##' 
-##' @method plot mhist.summary
-##' @S3method plot mhist.summary
-##' 
-##' @param x a \code{mhist.summary} object as produced by \code{mhist.summary}
-##' @param bins character vecter, the bin labels; if non-specific, bins are numbered/labeled starting with one.
-##' @param plot.ci logical, indicating whether plot error bars that represent
-##' the 0.50 confidence interval (CI) 
-##' @param col color of the histogram
-##' @param ci.color color of the error bars
-##' @param tcl the length of tick marks as a fraction of the height of a line of text.
-##' See option \code{tcl} in\code{help("par", package="graphics")}.
-##' @param omi a vector of the form 'c(bottom, left, top, right)' giving the size of the outer margins in inches.
-##' See option \code{omi} in\code{help("par", package="graphics")}.
-##' @param mar a numerical vector of the form \code{c(bottom, left, top, right)} which gives the number of lines
-##' of margin to be specified on the four sides of the plot.
-##' See option \code{mar} in\code{help("par", package="graphics")}.
-##' @param mgp the margin line (in 'mex' units) for the axis title, axis labels and axis line.
-##' @param if.plot.new logical, whether starting a new device or not.
-##' @param ... arguments to be passed to method \code{plot.mhist.summary}.
-##' See \code{help("barplot2", package="gplots")}.
 plot.mhist.summary <-
   function(x,
            bins,
@@ -687,7 +694,7 @@ plot.mhist.summary <-
   if (!inherits(x,"mhist.summary")){
     stop("`x' should be an object of class `mhist.summary'.")
   }
-  if(invalid(bins)) bins <- attr(x,"bins")
+  if (.invalid(bins)) bins <- attr(x,"bins")
   if (if.plot.new) {
     par(omi=omi,mar=mar,mgp=mgp,tcl=tcl)
   }
